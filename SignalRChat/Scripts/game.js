@@ -294,18 +294,10 @@
 
     function getOpenValue(listPosition)
     {
-        if(listPosition == "first"){
-            if (list_firstDirectionIndex == 0 || list_firstDirectionIndex == 3)
-                return viewModel.playedTiles()[0].value1;
-            else
-                return viewModel.playedTiles()[0].value2;
-        }
-        else {
-            if (list_lastDirectionIndex == 0)
-                return viewModel.playedTiles()[viewModel.playedTiles().length - 1].value2;
-            else
-                return viewModel.playedTiles()[viewModel.playedTiles().length - 1].value1;
-        }
+        if (listPosition == "first")
+            return viewModel.playedTiles()[0].value1;
+        else
+            return viewModel.playedTiles()[viewModel.playedTiles().length -1 ].value2;
     }
 
     //accepts values is an array of numbers
@@ -338,11 +330,11 @@
                 //remove the selectedTile from myTiles and add it to played game
                 viewModel.myRoundTiles.remove(viewModel.mySelectedTile());
 
-                playTileOnBoard(viewModel.mySelectedTile(), listPosition);
+                var tilePlayed = playTileOnBoard(viewModel.mySelectedTile(), listPosition);
 
 
                 //TODO: alert server of play
-                gameHub.server.userPlayedTile(gameCode, viewModel.mySelectedTile(), listPosition)
+                gameHub.server.userPlayedTile(gameCode, tilePlayed, listPosition)
                 userInTurn = false;
                 
 
@@ -399,6 +391,7 @@
                         } break;
                     case 2:
                         {
+                            //just in this case, I need to invert both divs with the values
                             $(selector).removeClass("horizontal");
 
                             $(selector).position({
@@ -406,6 +399,10 @@
                                 my: "right top",
                                 at: "right bottom"
                             });
+
+                            
+                            //invert tile value div positions
+                            invertTileValueDivs(selector);
                         } break;
 
                     case 3:
@@ -451,8 +448,8 @@
 
                             $(selector).position({
                                 of: $(anchorSelector),
-                                my: "center bottom",
-                                at: "center top"
+                                my: "left bottom",
+                                at: "left top"
                             });
                         } break;
 
@@ -483,7 +480,7 @@
 
             //check if the piece is not inside
             if (
-                tilePosition.left < 0 ||
+                tilePosition.left < containerPosition.left ||
                 tilePosition.left + $(selector).outerWidth(false) > containerPosition.left + $(allTileContainer).innerWidth() ||
                 tilePosition.top < containerPosition.top ||
                 tilePosition.top + $(selector).outerHeight(false) > containerPosition.top + $(allTileContainer).innerHeight()
@@ -521,6 +518,13 @@
         
     }
 
+    function invertTileValueDivs(selector)
+    {
+        $(selector).children("div:first").clone().appendTo(selector);
+        $(selector).children("div:first").remove();
+    }
+    
+
     //tile is a tile object, listPosition is either "first" or "last"
     function playTileOnBoard(tile, listPosition)
     {
@@ -554,63 +558,68 @@
                     //check if the values that connect go together, if not, make sure they are
                     var firstOpenValue = getOpenValue(listPosition);
 
+                    //add tile to game
+                    viewModel.playedTiles.unshift(tile);
+                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
+
+                    //TODO: make this cleaner, we shouldn't have to call playedTiles and positionTile twice for this method. 
                     //shift viewModel when appropriate
-                    if ((list_firstDirectionIndex == 0 && firstOpenValue != tile.value2) ||
-                        (list_firstDirectionIndex == 3 && firstOpenValue != tile.value2) ||
-                        (list_firstDirectionIndex == 1 && firstOpenValue != tile.value1) ||
-                        (list_firstDirectionIndex == 2 && firstOpenValue != tile.value1)
-                        )
-                    {
+                    //have to special case 2 because for this particular case, we need to invert the divs in the tiles and keep the values in hte viewModel the same
+                    if (
+                        (list_firstDirectionIndex <= 1 && firstOpenValue != tile.value2)
+                      ) {
+
+                        viewModel.playedTiles.shift();
+
                         WriteConsole("Need to invert tile values");
+
                         var tempValue = tile.value1;
                         tile.value1 = tile.value2;
                         tile.value2 = tempValue;
+                        
+                        
+                        //removed and added new tile
+                        viewModel.playedTiles.unshift(tile);
+                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
+
+                        if (list_firstDirectionIndex == 2)
+                            invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
 
-                    //add tile to game
-                    viewModel.playedTiles.unshift(tile);
-
-                    //TODO: need to turn if past the top
-                    //TODO: delete commented code if tiles now turn
-                    //$(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").position({
-                    //    of: $(".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']"),
-                    //    my: "center bottom",
-                    //    at: "center top"
-                    //});
-
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
                 } break;
 
                 case "last": {
                     //check if the values that connect go together, if not, make sure they are
                     var lastOpenValue = getOpenValue(listPosition);
 
+                    viewModel.playedTiles.push(tile);
+                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
+
+                    //TODO: make this cleaner
                     //shift viewModel when appropriate
-                    if ((list_lastDirectionIndex == 0 && lastOpenValue != tile.value1) ||
-                        (list_lastDirectionIndex == 3 && lastOpenValue != tile.value2) ||
-                        (list_lastDirectionIndex == 1 && lastOpenValue != tile.value1) ||
-                        (list_lastDirectionIndex == 2 && lastOpenValue != tile.value1)
-                        )
-                    {
+                    if (
+                        (list_lastDirectionIndex <= 1 && lastOpenValue != tile.value1)
+                      ) {
                         WriteConsole("Need to invert tile values");
+                        viewModel.playedTiles.pop();
+
                         var tempValue = tile.value1;
                         tile.value1 = tile.value2;
-                        tile.value2 = tempValue;
+                        tile.value2 = tempValue; 
+
+                        //removed and added new tile
+                        viewModel.playedTiles.push(tile);
+                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
+
+
+                        if (list_lastDirectionIndex == 2)
+                            invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
-
-                    viewModel.playedTiles.push(tile);
-
-                    //TODO: need to turn if past the bottom
-                    //$(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").position({
-                    //    of: $(".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length-2].id + "']"),
-                    //    my: "center top",
-                    //    at: "center bottom"
-                    //});
-
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
                 } break;
             }
         }
+
+        return tile;
     }
 
     //section "round for gameplay, select for shuffle"

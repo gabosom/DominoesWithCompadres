@@ -133,7 +133,7 @@ input[type="checkbox"].input-validation-error {
 
 .horizontal > .tileHalf
 {
-    float:left;
+    float:right;
 }
 
 .horizontal > .tileHalf:first-child{
