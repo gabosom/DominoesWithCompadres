@@ -231,6 +231,30 @@
             Debug_OutputArray(viewModel.playedTiles(), "Played tiles array");
             
             generateDroppableZonesForPlays();
+
+            
+
+            var canMakeMove = false;
+            //check if I can actually make a move
+            var firstOpenValue = getOpenValue("first");
+            var lastOpenValue = getOpenValue("last");
+
+            for(i = 0; i < viewModel.myRoundTiles().length; i++)
+            {
+                if(
+                    viewModel.myRoundTiles()[i].value1 == firstOpenValue ||
+                    viewModel.myRoundTiles()[i].value1 == lastOpenValue
+                )
+                {
+                    canMakeMove = true;
+                    break;
+                }
+            }
+
+            if(!canMakeMove)
+            {
+                alert('no moves!');
+            }
         }
     }
 
