@@ -79,7 +79,7 @@
         this.initializeRound = function(round){
             self.setPlayerInTurn(round.playerInTurn);
 
-            //TODO: need a way to clean up the old values before just assigning empty
+            //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles([]);
         };
 
@@ -91,13 +91,10 @@
                 
                 self.mySelectedTile(selectedTile);
 
-                //TODO: if user clicks a selected tile, it should unselect and hide possible plays
+                //TODO 2: if user clicks a selected tile, it should unselect and hide possible plays
                 $(".myTileContainer > div[data-tileId='" + selectedTile.id+ "'").addClass("selected");
 
-                //show where the selected tile can be placed
-                //TODO: pass the tileIndex instead of the tileId
-
-                
+                //show where the selected tile can be placed                
                 showPossibleTilePlays(selectedTile);
             }
         };
@@ -170,14 +167,14 @@
         }
         else
         {
-            //TODO: animation for taken
+            //TODO 3: animation for taken
             tilesInRoundClient--;
             $("div[data-tileId='" + tileId + "'").addClass("otherSelected");
         }
     };
 
     gameHub.client.updatePlayerInTurn = function (playerPosition) {
-        //TODO: update view model and subscribe to changes to make stuff happen there
+        //TODO 4: update view model and subscribe to changes to make stuff happen there
         updatePlayerInTurn(playerPosition);
 
     };
@@ -186,7 +183,7 @@
         viewModel.initializeRound(currentRound);
         initializeRound();
 
-        //TODO: viewModel changes to current player should trigger update user, for now, forcing manually
+        //TODO 5: viewModel changes to current player should trigger update user, for now, forcing manually
         updatePlayerInTurn(viewModel.playerInTurn());
     };
 
@@ -216,7 +213,7 @@
     ///user getting ready for round
     $("#btnRoundReady").click(function () {
         $(".readyInfoHidden").addClass("readyInfoShown").removeClass("readyInfoHidden");
-        //TODO: make ready button like its pressed and disabled
+        //TODO 6: make ready button like its pressed and disabled
 
         gameHub.server.userReady($("#gameCode").val());
     });
@@ -240,7 +237,7 @@
     //check if it's users turn
     function isUsersTurn()
     {
-        //TODO: need better way of doing this
+        //TODO 7: need better way of doing this
         //if it's my turn then true, else false
         if (gameHub.connection.id == viewModel.players()[viewModel.playerInTurn()].connectionId) {
             userInTurn = true;
@@ -288,8 +285,6 @@
             $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
 
             //set positioning
-            //TODO: make this lanes turn as needed
-
             positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileId='" + firstTile.id + "']", "first");
 
             positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileId='" + lastTile.id + "']", "last");
@@ -317,7 +312,7 @@
     //listPosition is a string with 2 possibel values "first" or "last"
     function createDroppableTarget(acceptsValues, listPosition) {
 
-        //TODO: validate that listPosition is a valid place
+        //TODO 8: validate that listPosition is a valid place
 
         //generate tile droppable zone 
         var drop = document.createElement("div");
