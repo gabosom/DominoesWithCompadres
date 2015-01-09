@@ -4,7 +4,7 @@
     <div id="playerContiner">
         <ul data-bind="foreach: players" id="playerList">
             @*<li class="player" data-bind="text: DisplayName, css: { active: $index == $parent.playerInTurn() }">$index</li>*@
-            <li class="player" data-bind="text: $index, css: { active: $index() == $parent.playerInTurn() }"></li>
+            <li class="player" data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></li>
         </ul>
         Player in turn <span data-bind="text: playerInTurn"></span>
     </div>
