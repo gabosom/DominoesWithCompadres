@@ -41,9 +41,9 @@ namespace DominoesWithCompadres.Controllers
         {
             try
             {
-                //TODO: if model is incomplete, then redirect with error
+                //TODO 10: if model is incomplete, then redirect with error
 
-                //TODO: make sure the gamecode is always caps
+                //TODO 11: make sure the gamecode is always caps
 
                 ViewBag.DisplayName = GameStartDetails.UserDisplayName;
 
@@ -61,7 +61,7 @@ namespace DominoesWithCompadres.Controllers
                     }
                     else
                     {
-                        //TODO
+                        //TODO 12
                         throw new Exception("Game doesn't exist");
                     }
                 }
@@ -72,29 +72,7 @@ namespace DominoesWithCompadres.Controllers
             }
         }
 
-        //
-        // GET: /Game/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        //
-        // POST: /Game/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add update logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        
 
         //
         // GET: /Game/Delete/5
@@ -110,7 +88,7 @@ namespace DominoesWithCompadres.Controllers
         {
             try
             {
-                // TODO: Add delete logic here
+                // TODO 13: Add delete logic here
 
                 return RedirectToAction("Index");
             }

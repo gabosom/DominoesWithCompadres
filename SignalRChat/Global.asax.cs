@@ -19,7 +19,7 @@ namespace DominoesWithCompadres
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            //TODO: blog about adding webapi dlls
+            //TODO-Later: blog about adding webapi dlls
             //make sure enums go back as strings and not ints
             SerializeSettings(GlobalConfiguration.Configuration);
 

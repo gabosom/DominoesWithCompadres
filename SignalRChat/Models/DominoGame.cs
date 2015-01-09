@@ -34,7 +34,7 @@ namespace DominoesWithCompadres.Models
 
         private void GenerateTiles()
         {
-            //TODO: generate the right tile IDs
+            //TODO 18: generate the right tile IDs
             for(int i = 0; i <= 6; i++)
             {
                 for(int j = i; j <= 6; j++)

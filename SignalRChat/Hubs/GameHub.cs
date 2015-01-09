@@ -24,7 +24,6 @@ namespace DominoesWithCompadres.Hubs
 
             game.AddPlayer(newPlayer);
 
-            //TODO: update clients wth game state
             //if users > 2, game.state = WaitingUsersReady
             game.State = GameState.WaitingUsersReady;
             
@@ -40,7 +39,7 @@ namespace DominoesWithCompadres.Hubs
     
         public void UserReady(string gameCode)
         {
-            //TODO try/catch
+            //TODO 14 try/catch
             DominoGame game = GameService.Get(gameCode);
 
             //TODO try/catch
@@ -53,7 +52,7 @@ namespace DominoesWithCompadres.Hubs
     
         public void SelectedTile(string gameCode, int tileId)
         {
-            //TODO: try/catch
+            //TODO 15: try/catch
             DominoGame game = GameService.Get(gameCode);
 
             bool selectedTile = game.SelectTile(Context.ConnectionId, tileId);
@@ -78,7 +77,7 @@ namespace DominoesWithCompadres.Hubs
         public void UserPlayedTile(string gameCode, Tile tilePlayed, string listPosition)
         {
 
-            //TODO: try/catch
+            //TODO 16: try/catch
             DominoGame game = GameService.Get(gameCode);
 
             if(tilePlayed != null)
@@ -93,7 +92,7 @@ namespace DominoesWithCompadres.Hubs
                 }
                 else
                 {
-                    //TODO: alert clients, what could go wrong here? maybe other clients trying to hack the game
+                    //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
                 }
             }
             
