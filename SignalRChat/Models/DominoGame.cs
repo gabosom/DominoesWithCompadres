@@ -73,6 +73,10 @@ namespace DominoesWithCompadres.Models
                 this.CurrentRound = null;
 
             this.CurrentRound = new Round();
+
+            //make all players 0 points
+            foreach (Player p in this.Players)
+                p.Points = 0; 
         }
 
 
@@ -203,7 +207,15 @@ namespace DominoesWithCompadres.Models
 
 
             //set next player
-            this.PlayerNextTurn();
+            if(curPlayer.Tiles.Count > 0)
+            {
+                this.PlayerNextTurn();
+                this.CurrentRound.PlayersThatPassed.Clear();
+            }
+            else
+            {
+                this.State = GameState.RoundFinished;
+            }
 
             return true;
         }
@@ -211,6 +223,19 @@ namespace DominoesWithCompadres.Models
         private void PlayerNextTurn()
         {
             this.CurrentRound.PlayerInTurn = ++this.CurrentRound.PlayerInTurn % this.Players.Count;
+        }
+
+        internal void PlayerPassTurn(string p)
+        {
+            this.CurrentRound.PlayersThatPassed.Add(p);
+            
+            //if everone has passed, then end game
+            if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
+            {
+                this.State = GameState.RoundFinished;
+            }
+            else
+                this.PlayerNextTurn();
         }
     }
 

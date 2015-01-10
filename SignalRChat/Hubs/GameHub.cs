@@ -88,12 +88,28 @@ namespace DominoesWithCompadres.Hubs
                 if(playIsGood)
                 {
                     Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
-                    Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
                 else
                 {
                     //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
                 }
+            }
+            else
+            {
+                game.PlayerPassTurn(Context.ConnectionId);
+
+                //TODO: send message to clients to show something like a pass message
+                //TODO: Round over when all players pass
+                Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+            }
+
+
+            //check what the game state is
+            switch(game.State)
+            {
+                case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
+                case GameState.RoundFinished: Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game)); break;
+                case GameState.Finished: break;
             }
             
         }

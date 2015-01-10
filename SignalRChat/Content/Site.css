@@ -139,6 +139,7 @@ input[type="checkbox"].input-validation-error {
 .horizontal > .tileHalf:first-child{
     border-bottom: none;
     border-right:1px solid black;
+    border-left:1px solid black;
 }
 
 .tileHalf
@@ -192,9 +193,6 @@ input[type="checkbox"].input-validation-error {
 }
 
 .myTileContainer{
-   /*position:fixed;
-   left:0px;
-   bottom:0px;*/
    height:150px;
    width:100%;
    background:#b94a48;
@@ -202,4 +200,8 @@ input[type="checkbox"].input-validation-error {
 
 .myTileContainer > .selected{
     border: 2px solid red;
+}
+
+.btnPassTurn{
+    visibility:hidden;
 }

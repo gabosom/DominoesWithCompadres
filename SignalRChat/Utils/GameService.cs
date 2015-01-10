@@ -1,4 +1,5 @@
 ﻿using DominoesWithCompadres.Models;
+using DominoesWithCompadres.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,54 @@ namespace DominoesWithCompadres.Utils
         public static int GeneratePlayerId()
         {
             return GameService.PlayerIDCount++;
+        }
+
+        public static RoundResults GetRoundResults(DominoGame game)
+        {
+            RoundResults results = new RoundResults();
+            StringBuilder messageBuilder = new StringBuilder();
+
+            messageBuilder.Append("Winner: ");
+            
+            //Make this more efficient
+            //get player with 0 tiles
+            Player winningPlayer = game.Players.Single<Player>(p => p.Tiles.Count == 0);
+            
+            messageBuilder.Append(winningPlayer.DisplayName);
+            
+
+            //if it's a team game, then add team mate
+            if(game.Players.Count == 4)
+            {
+                Player otherWinner = game.Players[(game.Players.IndexOf(winningPlayer) + 2) % 4]; 
+                results.Winners.Add(otherWinner);
+                messageBuilder.Append(" ").Append(otherWinner.DisplayName);
+            }
+
+
+            //calculate winning points
+            List<Player> losers = game.Players.Where<Player>(p => !results.Winners.Contains(p)).ToList<Player>();
+            int totalPoints = 0;
+
+            foreach(Player p in losers)
+            {
+                foreach(Tile t in p.Tiles)
+                {
+                    totalPoints += t.Value1;
+                    totalPoints += t.Value2;
+                }
+            }
+            winningPlayer.Points += totalPoints;
+            results.Winners.Add(winningPlayer);
+
+
+            //TODO: better message
+
+            messageBuilder.Append(" won " + totalPoints + ".");
+
+
+            results.Message = messageBuilder.ToString();
+            return results;
         }
     }
 }

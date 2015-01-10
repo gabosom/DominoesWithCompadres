@@ -161,6 +161,7 @@
     <Compile Include="Models\Round.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\ViewModel\GameStart.cs" />
+    <Compile Include="Models\ViewModel\RoundResults.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\GameService.cs" />

@@ -193,7 +193,9 @@
         updatePlayerInTurn(nextPlayerInTurn);
     };
 
-
+    gameHub.client.roundFinished = function (roundResults) {
+        var a = 1;
+    };
 
 
     
@@ -233,28 +235,34 @@
             generateDroppableZonesForPlays();
 
             
-
-            var canMakeMove = false;
-            //check if I can actually make a move
-            var firstOpenValue = getOpenValue("first");
-            var lastOpenValue = getOpenValue("last");
-
-            for(i = 0; i < viewModel.myRoundTiles().length; i++)
+            if (viewModel.playedTiles().length > 0)
             {
-                if(
-                    viewModel.myRoundTiles()[i].value1 == firstOpenValue ||
-                    viewModel.myRoundTiles()[i].value1 == lastOpenValue
-                )
+                var canMakeMove = false;
+                //check if I can actually make a move
+                var firstOpenValue = getOpenValue("first");
+                var lastOpenValue = getOpenValue("last");
+
+                for(i = 0; i < viewModel.myRoundTiles().length; i++)
                 {
-                    canMakeMove = true;
-                    break;
+                    if(
+                        viewModel.myRoundTiles()[i].value1 == firstOpenValue ||
+                        viewModel.myRoundTiles()[i].value1 == lastOpenValue ||
+                        viewModel.myRoundTiles()[i].value2 == firstOpenValue ||
+                        viewModel.myRoundTiles()[i].value2 == lastOpenValue 
+                    )
+                    {
+                        canMakeMove = true;
+                        break;
+                    }
                 }
+
+                if(!canMakeMove)
+                {
+                    $(".btnPassTurn").css("visibility", "visible");
+                }
+
             }
 
-            if(!canMakeMove)
-            {
-                alert('no moves!');
-            }
         }
     }
 
@@ -400,7 +408,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "center bottom",
-                                at: "center top"
+                                at: "center top",
+                                collision: "none"
                             });
                         } break;
                     case 1:
@@ -410,7 +419,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "left top",
-                                at: "right top"
+                                at: "right top",
+                                collision: "none"
                             });
                         } break;
                     case 2:
@@ -421,7 +431,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "right top",
-                                at: "right bottom"
+                                at: "right bottom",
+                                collision: "none"
                             });
 
                             
@@ -436,7 +447,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "left bottom",
-                                at: "right bottom"
+                                at: "right bottom",
+                                collision: "none"
                             });
                         } break;
                 }
@@ -453,7 +465,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "center top",
-                                at: "center bottom"
+                                at: "center bottom",
+                                collision: "none"
                             });
                         } break;
                     case 1:
@@ -463,7 +476,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "right bottom",
-                                at: "left bottom"
+                                at: "left bottom",
+                                collision: "none"
                             });
                         } break;
                     case 2:
@@ -473,7 +487,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "left bottom",
-                                at: "left top"
+                                at: "left top",
+                                collision: "none"
                             });
                         } break;
 
@@ -484,7 +499,8 @@
                             $(selector).position({
                                 of: $(anchorSelector),
                                 my: "right top",
-                                at: "left top"
+                                at: "left top",
+                                collision: "none"
                             });
                         } break;
                 }
@@ -539,7 +555,6 @@
             }
             //isTilePlacedCorrectly = true;
         }
-        
     }
 
     function invertTileValueDivs(selector)
@@ -590,7 +605,7 @@
                     //shift viewModel when appropriate
                     //have to special case 2 because for this particular case, we need to invert the divs in the tiles and keep the values in hte viewModel the same
                     if (
-                        (list_firstDirectionIndex <= 1 && firstOpenValue != tile.value2)
+                        (firstOpenValue != tile.value2)
                       ) {
 
                         viewModel.playedTiles.shift();
@@ -606,8 +621,8 @@
                         viewModel.playedTiles.unshift(tile);
                         positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
 
-                        if (list_firstDirectionIndex == 2)
-                            invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
+                        //if (list_firstDirectionIndex == 2)
+                        //    invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
 
                 } break;
@@ -622,7 +637,7 @@
                     //TODO: make this cleaner
                     //shift viewModel when appropriate
                     if (
-                        (list_lastDirectionIndex <= 1 && lastOpenValue != tile.value1)
+                        (lastOpenValue != tile.value1)
                       ) {
                         WriteConsole("Need to invert tile values");
                         viewModel.playedTiles.pop();
@@ -641,6 +656,13 @@
                     }
                 } break;
             }
+
+            //TODO: find a better place for this logic
+            //when the tile is done, I need to make sure the tiles only curve once to fit more
+            if (list_firstDirectionIndex % 2 == 1)
+                list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
+
+
         }
 
         return tile;
@@ -756,6 +778,11 @@
         viewModel.updateGameState(state);
     }
 
+    $(".btnPassTurn").click(function () {
+        //TODO: only do this when in turn
+
+        gameHub.server.userPlayedTile(gameCode, null, null)
+    });
 
 
     /***** DEBUG FUNCTIONS *****/

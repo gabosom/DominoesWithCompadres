@@ -12,11 +12,13 @@ namespace DominoesWithCompadres.Models
         public LinkedList<Tile> PlayedTiles { get; set; }
         [JsonProperty("playerInTurn")]
         public int PlayerInTurn { get; set; }
+        public List<string> PlayersThatPassed { get; set; }
 
         public Round()
         {
             this.PlayedTiles = new LinkedList<Tile>();
             this.PlayerInTurn = 0;
+            this.PlayersThatPassed = new List<string>();
         }
     }
 }
