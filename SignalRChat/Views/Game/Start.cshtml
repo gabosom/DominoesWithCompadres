@@ -4,9 +4,9 @@
     <div id="playerContiner">
         <ul data-bind="foreach: players" id="playerList">
             @*<li class="player" data-bind="text: DisplayName, css: { active: $index == $parent.playerInTurn() }">$index</li>*@
-            <li class="player"> <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span> : <span data-bind="text: points"></span></li>
+            <li class="player" data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></li>
         </ul>
-        Player in turn <span data-bind="text: playerInTurn"></span> 
+        Player in turn <span data-bind="text: playerInTurn"></span>
     </div>
 
     <div>GameCode: <span data-bind="text: gameCode"></span></div>
@@ -16,6 +16,11 @@
     <input type="hidden" id="displayName" value="@ViewBag.DisplayName" />
 
     <div id="boardContainer">
+
+        <div class="state selectReadyContainer">
+            <input id="btnRoundReady" type="button" value="Ready" />
+            <div class="readyInfoHidden">Waiting on other users... Please wait...</div>
+        </div>
 
         <div class="state selectTileContainer">
             <div id="selectTiles" data-bind="foreach: availableTiles">
@@ -45,14 +50,8 @@
                     <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
                 </div>
             </div>
+            
         </div>
-
-        <div class="state selectReadyContainer">
-            <div data-bind="text: roundOverMessage"></div>
-            <input id="btnRoundReady" type="button" value="Ready" />
-            <div class="readyInfoHidden">Waiting on other users... Please wait...</div>
-        </div>
-
     </div>
 </div>
 

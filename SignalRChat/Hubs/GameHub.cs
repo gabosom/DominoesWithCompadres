@@ -48,9 +48,6 @@ namespace DominoesWithCompadres.Hubs
 
             if (game.IsEveryoneReady())
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
-
-            //TODO: need to shuffle and send available tiles
-
         }
     
         public void SelectedTile(string gameCode, int tileId)
@@ -111,11 +108,7 @@ namespace DominoesWithCompadres.Hubs
             switch(game.State)
             {
                 case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
-                case GameState.RoundFinished:
-                    {
-                        Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
-                        Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    } break;
+                case GameState.RoundFinished: Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game)); break;
                 case GameState.Finished: break;
             }
             

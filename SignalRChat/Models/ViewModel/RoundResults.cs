@@ -8,6 +8,8 @@ namespace DominoesWithCompadres.Models.ViewModel
 {
     public class RoundResults
     {
+        [JsonProperty("pointsInFavor")]
+        public int PointsInFavor { get; set; }
         [JsonProperty("winners")]
         public List<Player> Winners { get; set; }
         [JsonProperty("message")]

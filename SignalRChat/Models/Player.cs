@@ -14,7 +14,6 @@ namespace DominoesWithCompadres.Models
         public int ID { get; set; }
         public bool IsReady { get; set; }
         public List<Tile> Tiles { get; set; }
-        [JsonProperty("points")]
         public int Points { get; set; }
 
         public Player()
