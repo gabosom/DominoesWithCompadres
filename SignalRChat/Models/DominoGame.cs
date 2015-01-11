@@ -104,6 +104,7 @@ namespace DominoesWithCompadres.Models
 
         public void playerReady(string ConnectionId)
         {
+            //TODO:if gamestate is roundfinished or finished, need to update to waitingusersready
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
 
