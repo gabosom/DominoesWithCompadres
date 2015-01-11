@@ -36,6 +36,7 @@
         self.playerInTurn = ko.observable();
         self.mySelectedTile = ko.observable();
         self.firstPlayedTile = ko.observable();
+        self.roundOverMessage = ko.observable();
         
 
         this.initializeViewModel = function (game) {
@@ -55,9 +56,24 @@
             }
         };
 
+        self.setRoundOverMessage = function (message) {
+            self.roundOverMessage(message);
+        };
+
         this.addPlayer = function (player) {
             this.players.push(player);
         };
+
+        self.updatePlayers = function (players) {
+            //one loop to remove everything
+            for (i = 0; i < self.players().length; i++)
+                self.players.pop();
+
+            //one loop to add it all back
+            for (i = 0; i < players.length; i++)
+                self.players.push(players[i]);
+        };
+
 
         this.updateGameState = function (state) {
             this.state(state);
@@ -76,11 +92,11 @@
             }
         };
 
-        this.initializeRound = function(round){
+        self.initializeRound = function(round){
             self.setPlayerInTurn(round.playerInTurn);
 
             //TODO 1: need a way to clean up the old values before just assigning empty
-            self.playedTiles([]);
+            self.playedTiles.removeAll();
         };
 
         self.selectMyTile = function (selectedTile, event) {
@@ -194,7 +210,17 @@
     };
 
     gameHub.client.roundFinished = function (roundResults) {
-        var a = 1;
+
+        WriteConsole("Round over");
+        WriteConsole(JSON.stringify(roundResults));
+        //TODO: need to use knockout mapping to fix this better, for now, I will just send all the players and update the array
+        //gamehub service should only inclue the winners in the round results
+        viewModel.updatePlayers(roundResults.winners);
+
+        //set all the data in the view model
+        viewModel.setRoundOverMessage(roundResults.message);
+
+        //the message will be shown when clients get the update game state event
     };
 
 
@@ -714,7 +740,8 @@
     ///need to check with server if no one else has selected that one
     function setSelectableTiles() {
 
-        $("#selectTiles > .tile").draggable();
+        //TODO: make tiles draggable
+        //$("#selectTiles > .tile").draggable();
 
         $("#selectTiles > .tile").click(function () {
             if (!$(this).hasClass("selected") && !$(this).hasClass("otherSelected"))
@@ -735,7 +762,9 @@
     {
         //TODO: set the correct size for roundTileBoard, for now it's hardcoded
 
-
+        //remove selectes state from selectTiles
+        $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
+        tilesInRoundClient = 0;
     }
 
     //this is sending the tile object {id, value1, value2}
@@ -753,21 +782,23 @@
     ///general functions
     function changeGameState(state)
     {
-        $(".state").hide();
         switch(state)
         {
             case "WaitingUsersReady":
+            case "RoundFinished":
                 {
                     $(".selectReadyContainer").show();
                 } break;
 
             case "SelectingTiles":
                 {
+                    $(".state").hide();
                     $(".selectTileContainer").show();
                     setSelectableTiles();
                 } break;
             case "InProgress":
                 {
+                    $(".state").hide();
                     $(".gameInProgress").show();
 
                     //TODO: will need to refactor this once I have a table/viewer mode only

@@ -121,6 +121,11 @@ namespace DominoesWithCompadres.Utils
             messageBuilder.Append(" won " + totalPoints + ".");
 
 
+            //TODO: remove this until I use knockoutJS mapping for these things
+            results.Winners.Clear();
+            results.Winners = game.Players;
+
+
             results.Message = messageBuilder.ToString();
             return results;
         }
