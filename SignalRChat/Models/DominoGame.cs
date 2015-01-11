@@ -30,10 +30,14 @@ namespace DominoesWithCompadres.Models
             this.State = GameState.Created;
             this.ReadyForRound = false;
             this.GenerateTiles();
+            //this.InitializeRound();
         }
 
+        //TODO: generate tiles on Round start
         private void GenerateTiles()
         {
+            this.AvailableTiles.Clear();
+
             //TODO 18: generate the right tile IDs
             for(int i = 0; i <= 6; i++)
             {
@@ -51,7 +55,6 @@ namespace DominoesWithCompadres.Models
 
         public void StartRound()
         {
-            InitializeRound();
 
             //randomly determine who starts 
             Random rand = new Random((int)DateTime.Now.Ticks);
@@ -62,8 +65,6 @@ namespace DominoesWithCompadres.Models
 
         public void StartRound(int playerPosition)
         {
-            InitializeRound();
-
             this.CurrentRound.PlayerInTurn = playerPosition;
         }
 
@@ -76,7 +77,14 @@ namespace DominoesWithCompadres.Models
 
             //make all players 0 points
             foreach (Player p in this.Players)
-                p.Points = 0; 
+            {
+                p.Tiles.Clear();
+                p.IsReady = false;
+            }
+
+            this.GenerateTiles();
+            this.ReadyForRound = false;
+
         }
 
 
@@ -99,16 +107,33 @@ namespace DominoesWithCompadres.Models
             }
 
             this.State = GameState.SelectingTiles;
+
             return true;
         }
 
-        public void playerReady(string ConnectionId)
+        private void ClearRound()
         {
+            //clean up previous selected tiles
+            foreach(Player p in this.Players)
+            {
+                p.Tiles.Clear();
+            }
+        }
+
+        public void PlayerReady(string ConnectionId)
+        {
+            //TODO: add variable to have isEveryoneReady as a variable instead of a method that always runs
+            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created)
+            {
+                this.State = GameState.WaitingUsersReady;
+                
+                //when restarting, need to remove previous tiles 
+                InitializeRound();
+            }
+
             //TODO:if gamestate is roundfinished or finished, need to update to waitingusersready
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
-
-            //TODO: add variable to have isEveryoneReady as a variable instead of a method that always runs
         }
 
         private Player GetPlayer(string ConnectionId)
@@ -139,7 +164,10 @@ namespace DominoesWithCompadres.Models
             else
             {
                 Player p = this.GetPlayer(playerConnectionId);
-                p.AddTile(t);
+
+                
+                if(p.Tiles.Count < 7)
+                    p.AddTile(t);
 
                 if (p.Tiles.Count == 7)
                     CheckIfRoundIsReady();
@@ -159,6 +187,7 @@ namespace DominoesWithCompadres.Models
                 }
             }
 
+            //if round ready initialize
             this.ReadyForRound = true;
             this.State = GameState.InProgress;
         }
@@ -215,7 +244,9 @@ namespace DominoesWithCompadres.Models
             }
             else
             {
+                //TODO: game finished, not just round
                 this.State = GameState.RoundFinished;
+                InitializeRound();
             }
 
             return true;
@@ -233,7 +264,9 @@ namespace DominoesWithCompadres.Models
             //if everone has passed, then end game
             if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
             {
+                //TODO: game finished, not just round
                 this.State = GameState.RoundFinished;
+                InitializeRound();
             }
             else
                 this.PlayerNextTurn();

@@ -24,9 +24,6 @@ namespace DominoesWithCompadres.Hubs
 
             game.AddPlayer(newPlayer);
 
-            //if users > 2, game.state = WaitingUsersReady
-            game.State = GameState.WaitingUsersReady;
-            
             //add user to SignalR group
             Groups.Add(Context.ConnectionId, gameCode);
 
@@ -43,12 +40,14 @@ namespace DominoesWithCompadres.Hubs
             DominoGame game = GameService.Get(gameCode);
 
             //TODO try/catch
-            game.playerReady(Context.ConnectionId);
+            game.PlayerReady(Context.ConnectionId);
 
 
             if (game.IsEveryoneReady())
+            {
+                Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
-
+            }
             //TODO: need to shuffle and send available tiles
 
         }

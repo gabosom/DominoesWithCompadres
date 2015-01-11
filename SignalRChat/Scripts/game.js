@@ -51,9 +51,9 @@
             this.state(game.State);
 
 
-            for (i = 0; i < game.AvailableTiles.length; i++) {
-                this.availableTiles.push(game.AvailableTiles[i]);
-            }
+            //for (i = 0; i < game.AvailableTiles.length; i++) {
+            //    this.availableTiles.push(game.AvailableTiles[i]);
+            //}
         };
 
         self.setRoundOverMessage = function (message) {
@@ -74,6 +74,14 @@
                 self.players.push(players[i]);
         };
 
+        self.setAvailableTiles = function (tiles) {
+            self.availableTiles.removeAll();
+
+            for (i = 0; i < tiles.length; i++)
+                self.availableTiles.push(tiles[i]);
+
+            setSelectableTiles();
+        };
 
         this.updateGameState = function (state) {
             this.state(state);
@@ -164,6 +172,10 @@
     gameHub.client.setupGame = function (game) {
         viewModel.initializeViewModel(game);
         changeGameState(game.State);
+    };
+
+    gameHub.client.setAvailableTiles = function (tiles) {
+        viewModel.setAvailableTiles(tiles);
     };
 
     gameHub.client.updateGameState = function (state) {
@@ -741,6 +753,7 @@
     function setSelectableTiles() {
 
         //TODO: make tiles draggable
+        //TODO: this is getting called twice because I call setSelectableTIles twice
         //$("#selectTiles > .tile").draggable();
 
         $("#selectTiles > .tile").click(function () {
@@ -794,7 +807,6 @@
                 {
                     $(".state").hide();
                     $(".selectTileContainer").show();
-                    setSelectableTiles();
                 } break;
             case "InProgress":
                 {
