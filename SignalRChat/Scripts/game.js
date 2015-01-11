@@ -528,6 +528,8 @@
                                 at: "left top",
                                 collision: "none"
                             });
+
+                            invertTileValueDivs(selector);
                         } break;
 
                     case 3:
@@ -663,6 +665,11 @@
                         //    invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
 
+                    //TODO: find a better place for this logic
+                    //when the tile is done, I need to make sure the tiles only curve once to fit more
+                    if (list_firstDirectionIndex % 2 == 1)
+                        list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
+
                 } break;
 
                 case "last": {
@@ -689,18 +696,15 @@
                         positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
 
 
-                        if (list_lastDirectionIndex == 2)
-                            invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
+                        //if (list_lastDirectionIndex == 2)
+                        //    invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
+
+                    if (list_lastDirectionIndex % 2 == 1)
+                        list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
+
                 } break;
             }
-
-            //TODO: find a better place for this logic
-            //when the tile is done, I need to make sure the tiles only curve once to fit more
-            if (list_firstDirectionIndex % 2 == 1)
-                list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
-
-
         }
 
         return tile;
