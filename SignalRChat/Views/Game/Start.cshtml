@@ -50,9 +50,13 @@
         </div>
 
         <div class="state selectReadyContainer">
-            <div data-bind="text: roundOverMessage"></div>
-            <input id="btnRoundReady" type="button" value="Ready" />
-            <div class="readyInfoHidden">Waiting on other users... Please wait...</div>
+            <div class="overlay">
+                <div class="overlayContent">
+                    <div data-bind="text: message"></div>
+                    <input id="btnRoundReady" type="button" value="Ready" />
+                    <div class="readyInfoHidden">Waiting on other users... Please wait...</div>
+                </div>
+            </div>
         </div>
 
     </div>

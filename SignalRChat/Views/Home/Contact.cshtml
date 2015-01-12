@@ -2,16 +2,106 @@
     ViewBag.Title = "Contact";
 }
 <h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
+<h3>Device properties</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+@section scripts{
+    <script src="~/Scripts/knockout-3.2.0.js"></script>
+    <script>
+        $(function () {
+            function ViewModel()
+            {
+                var self = this;
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+                self.documentWidth = ko.observable();
+                self.documentHeight = ko.observable();
+
+                self.innerHeight = ko.observable();
+                self.innerHeight = ko.observable();
+
+                self.outerWidth = ko.observable();
+                self.outerHeight = ko.observable();
+            }
+
+
+            var viewModel = new ViewModel();
+            ko.applyBindings(viewModel);
+
+
+            //set properties
+            viewModel.documentWidth($(document).width());
+            viewModel.documentHeight($(document).height());
+
+            viewModel.innerWidth($(document).innerWidth());
+            viewModel.innerHeight($(document).innerHeight());
+
+            viewModel.outerWidth($(document).outerWidth());
+            viewModel.outerHeight($(document).outerHeight());
+
+
+
+
+
+
+
+            //bind change events
+            $(window).bind('orientationchange', function(e) {
+
+                switch ( window.orientation ) {
+
+                    case 0:
+                        alert('portrait mode');
+                        break;
+
+                    case 90:
+                        alert('landscape mode screen turned to the left');
+                        break;
+
+                    case -90:
+                        alert('landscape mode screen turned to the right');
+                        break;
+
+                }
+        });
+
+        
+    </script>
+}
+
+
+<div>
+    <div>
+        Document Width <span data-bind="text: documentWidth"></span> px
+    </div>
+
+    <div>
+        Document Height <span data-bind="text: documentHeight"></span> px
+    </div>
+
+    <div>
+        Document Inner Width <span data-bind="text: innerWidth"></span> px
+    </div>
+
+    <div>
+        Document Inner Height <span data-bind="text: innerHeight"></span> px
+    </div>
+
+    <div>
+        Document Outer Width <span data-bind="text: outerWidth"></span> px
+    </div>
+
+    <div>
+        Document Outer Height <span data-bind="text: outerHeight"></span> px
+    </div>
+</div>
+
+@*<address>
+        One Microsoft Way<br />
+        Redmond, WA 98052-6399<br />
+        <abbr title="Phone">P:</abbr>
+        425.555.0100
+    </address>
+
+    <address>
+        <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
+        <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+    </address>*@

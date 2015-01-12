@@ -65,6 +65,11 @@ input[type="checkbox"].input-validation-error {
 
 
 /** intial setup **/
+#boardContainer{
+    position:relative;
+    height:600px;
+}
+
 .state{
     display:none;
 }
@@ -73,6 +78,25 @@ input[type="checkbox"].input-validation-error {
 {
     visibility:visible;
     display:block;
+    height:600px;
+    position:absolute;
+    top:0px;
+    left:0px;
+}
+
+.selectReadyContainer > .overlay
+{
+    background-color: rgba(3, 3, 3, 0.81);
+    width:800px;
+    height: 600px;
+}
+
+.selectReadyContainer > .overlay > .overlayContent
+{
+    background-color: #40bb3e;
+    height:200px;
+    vertical-align: middle;
+    text-align: center;
 }
 
 /*** Users getting ready for round ***/
@@ -181,6 +205,11 @@ input[type="checkbox"].input-validation-error {
 
 /******* Game In Progress CSS ******/
 /*http://stackoverflow.com/questions/2971401/how-to-anchor-a-div-to-the-bottom-of-a-page*/
+.gameInProgress{
+    height:600px;
+    position:relative;
+}
+
 .roundTileBoard{
     width:800px;
     height: 400px;

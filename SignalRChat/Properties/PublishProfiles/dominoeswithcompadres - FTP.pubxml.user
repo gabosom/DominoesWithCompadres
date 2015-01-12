@@ -44,7 +44,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>01/09/2015 10:17:55</publishTime>
     </File>
     <File Include="bin/SignalRChat.dll">
-      <publishTime>01/12/2015 10:51:09</publishTime>
+      <publishTime>01/12/2015 11:49:51</publishTime>
     </File>
     <File Include="bin/System.Net.Http.Formatting.dll">
       <publishTime>01/09/2015 10:17:54</publishTime>

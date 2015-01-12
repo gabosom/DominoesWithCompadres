@@ -36,7 +36,7 @@
         self.playerInTurn = ko.observable();
         self.mySelectedTile = ko.observable();
         self.firstPlayedTile = ko.observable();
-        self.roundOverMessage = ko.observable();
+        self.message = ko.observable();
         
 
         this.initializeViewModel = function (game) {
@@ -52,8 +52,8 @@
 
         };
 
-        self.setRoundOverMessage = function (message) {
-            self.roundOverMessage(message);
+        self.setMessage = function (message) {
+            self.message(message);
         };
 
         this.addPlayer = function (player) {
@@ -225,7 +225,7 @@
         viewModel.updatePlayers(roundResults.winners);
 
         //set all the data in the view model
-        viewModel.setRoundOverMessage(roundResults.message);
+        viewModel.setMessage(roundResults.message);
 
         //the message will be shown when clients get the update game state event
     };
@@ -795,11 +795,27 @@
         viewModel.updateGameState(state);
     }
 
+
+
     $(".btnPassTurn").click(function () {
         //TODO 38: only do this when in turn
 
         gameHub.server.userPlayedTile(gameCode, null, null)
     });
+
+
+
+    /****** LAYOUT ******/
+    $(".selectReadyContainer > .overlay > .overlayContent").position({
+        of: $(".selectReadyContainer > .overlay"),
+        my: "center",
+        at: "center",
+        collision: "none"        
+    });
+
+
+    viewModel.setMessage("Game will begin when all players are ready...");
+
 
 
     /***** DEBUG FUNCTIONS *****/
