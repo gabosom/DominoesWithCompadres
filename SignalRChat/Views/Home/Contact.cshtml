@@ -1,5 +1,6 @@
 ﻿@{
     ViewBag.Title = "Contact";
+    Layout = "~/Views/Shared/_DominoGameLayout.cshtml";
 }
 <h2>@ViewBag.Title.</h2>
 <h3>Device properties</h3>
@@ -41,7 +42,7 @@
 
             viewModel.orientation(window.orientation);
 
-
+            viewModel.orientation((viewModel.documentHeight() > viewModel.documentWidth()) ? "portrait" : "landscape");
 
 
 
@@ -56,6 +57,8 @@
 
                 viewModel.outerWidth($(document).outerWidth());
                 viewModel.outerHeight($(document).outerHeight());
+
+                viewModel.orientation((viewModel.documentHeight() > viewModel.documentWidth()) ? "portrait" : "landscape");
             })
 
 
@@ -113,18 +116,6 @@
     </div>
 
     <div>
-        Orientation <span data-bind="text: orientation"></span> px
+        Orientation <span data-bind="text: orientation"></span> 
     </div>
 </div>
-
-@*<address>
-        One Microsoft Way<br />
-        Redmond, WA 98052-6399<br />
-        <abbr title="Phone">P:</abbr>
-        425.555.0100
-    </address>
-
-    <address>
-        <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-        <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-    </address>*@
