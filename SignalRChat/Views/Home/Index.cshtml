@@ -1,4 +1,6 @@
-﻿@{
+﻿@model DominoesWithCompadres.Models.ViewModel.GameStart
+
+@{
     ViewBag.Title = "Home Page";
 }
 
@@ -14,9 +16,17 @@
         {
             <input type="hidden" name="userAction" value="newGame" />
             <input type="text" name="userDisplayName" />
+            
+            foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
+                @Html.Label(value)
+                @Html.RadioButtonFor(model => model.UserType, value)
+            }
+            
+            
             <input type="submit" value="Create" />
+            
         }
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        
     </div>
     <div class="col-md-4">
         <h2>Join Existing Game</h2>

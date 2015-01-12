@@ -13,6 +13,7 @@ namespace DominoesWithCompadres.Models
         public string GameCode { get; set; }
         public DateTime CreatedDate { get; set; }
         public List<Player> Players { get; set; }
+        public List<Viewer> Viewers { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public GameState State { get; set; }
         public List<Tile> AvailableTiles { get; set; }
@@ -26,6 +27,7 @@ namespace DominoesWithCompadres.Models
         public DominoGame()
         {
             this.Players = new List<Player>();
+            this.Viewers = new List<Viewer>();
             this.AvailableTiles = new List<Tile>();
             this.State = GameState.Created;
             this.ReadyForRound = false;

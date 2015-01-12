@@ -226,6 +226,7 @@ input[type="checkbox"].input-validation-error {
 .roundTileBoard > .tile{
     position:absolute;
     display:block;
+    cursor: default;
 }
 
 .myTileContainer{

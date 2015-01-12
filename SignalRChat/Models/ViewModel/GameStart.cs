@@ -18,5 +18,13 @@ namespace DominoesWithCompadres.Models.ViewModel
                 this._GameCode = (string)value.ToUpper();
             }
         }
+        public UserType UserType { get; set; }
+
+    }
+
+    public enum UserType
+    {
+        Viewer,
+        Player
     }
 }
