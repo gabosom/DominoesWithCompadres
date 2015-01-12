@@ -50,10 +50,6 @@
 
             this.state(game.State);
 
-
-            //for (i = 0; i < game.AvailableTiles.length; i++) {
-            //    this.availableTiles.push(game.AvailableTiles[i]);
-            //}
         };
 
         self.setRoundOverMessage = function (message) {
@@ -65,9 +61,7 @@
         };
 
         self.updatePlayers = function (players) {
-            //one loop to remove everything
-            for (i = 0; i < self.players().length; i++)
-                self.players.pop();
+            self.players.removeAll();
 
             //one loop to add it all back
             for (i = 0; i < players.length; i++)

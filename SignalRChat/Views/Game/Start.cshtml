@@ -3,10 +3,8 @@
 <div id="gameContainer">
     <div id="playerContiner">
         <ul data-bind="foreach: players" id="playerList">
-            @*<li class="player" data-bind="text: DisplayName, css: { active: $index == $parent.playerInTurn() }">$index</li>*@
             <li class="player"> <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span> : <span data-bind="text: points"></span></li>
         </ul>
-        Player in turn <span data-bind="text: playerInTurn"></span> 
     </div>
 
     <div>GameCode: <span data-bind="text: gameCode"></span></div>
@@ -19,8 +17,13 @@
         <div class="state selectTileContainer">
             <div id="selectTiles" data-bind="foreach: availableTiles">
                 <div class="tile" data-bind="attr: {'data-tileId' : id}">
-                    <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
+                    @{
+                        if(Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DebugDominoes"]))
+                        {
+                            <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                     <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
+                        }
+                    }                    
                 </div>
             </div>
             <div class="clearfix"></div>
