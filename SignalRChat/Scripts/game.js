@@ -636,33 +636,21 @@
                     //check if the values that connect go together, if not, make sure they are
                     var firstOpenValue = getOpenValue(listPosition);
 
-                    //add tile to game
-                    viewModel.playedTiles.unshift(tile);
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
-
-                    //TODO 32: make this cleaner, we shouldn't have to call playedTiles and positionTile twice for this method. 
                     //shift viewModel when appropriate
-                    //have to special case 2 because for this particular case, we need to invert the divs in the tiles and keep the values in hte viewModel the same
                     if (
                         (firstOpenValue != tile.value2)
                       ) {
-
-                        viewModel.playedTiles.shift();
 
                         WriteConsole("Need to invert tile values");
 
                         var tempValue = tile.value1;
                         tile.value1 = tile.value2;
                         tile.value2 = tempValue;
-                        
-                        
-                        //removed and added new tile
-                        viewModel.playedTiles.unshift(tile);
-                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
-
-                        //if (list_firstDirectionIndex == 2)
-                        //    invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
+
+                    //removed and added new tile
+                    viewModel.playedTiles.unshift(tile);
+                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
 
                     //TODO: find a better place for this logic
                     //when the tile is done, I need to make sure the tiles only curve once to fit more
@@ -675,29 +663,20 @@
                     //check if the values that connect go together, if not, make sure they are
                     var lastOpenValue = getOpenValue(listPosition);
 
-                    viewModel.playedTiles.push(tile);
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
-
-                    //TODO: make this cleaner
                     //shift viewModel when appropriate
                     if (
                         (lastOpenValue != tile.value1)
                       ) {
                         WriteConsole("Need to invert tile values");
-                        viewModel.playedTiles.pop();
-
+                    
                         var tempValue = tile.value1;
                         tile.value1 = tile.value2;
                         tile.value2 = tempValue; 
-
-                        //removed and added new tile
-                        viewModel.playedTiles.push(tile);
-                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
-
-
-                        //if (list_lastDirectionIndex == 2)
-                        //    invertTileValueDivs(".roundTileBoard > .tile[data-tileid='" + tile.id + "']");
                     }
+
+                    //removed and added new tile
+                    viewModel.playedTiles.push(tile);
+                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
 
                     if (list_lastDirectionIndex % 2 == 1)
                         list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
