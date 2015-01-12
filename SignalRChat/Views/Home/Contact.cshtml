@@ -15,11 +15,13 @@
                 self.documentWidth = ko.observable();
                 self.documentHeight = ko.observable();
 
-                self.innerHeight = ko.observable();
+                self.innerWidth = ko.observable();
                 self.innerHeight = ko.observable();
 
                 self.outerWidth = ko.observable();
                 self.outerHeight = ko.observable();
+
+                self.orientation = ko.observable();
             }
 
 
@@ -37,30 +39,47 @@
             viewModel.outerWidth($(document).outerWidth());
             viewModel.outerHeight($(document).outerHeight());
 
-
+            viewModel.orientation(window.orientation);
 
 
 
 
 
             //bind change events
-            $(window).bind('orientationchange', function(e) {
+            $(window).bind("resize", function(e)
+            {
+                viewModel.documentWidth($(document).width());
+                viewModel.documentHeight($(document).height());
 
-                switch ( window.orientation ) {
+                viewModel.innerWidth($(document).innerWidth());
+                viewModel.innerHeight($(document).innerHeight());
+
+                viewModel.outerWidth($(document).outerWidth());
+                viewModel.outerHeight($(document).outerHeight());
+            })
+
+
+            $(window).bind('orientationchange', function (e) {
+
+                switch (window.orientation) {
 
                     case 0:
-                        alert('portrait mode');
+                        viewModel.orientation("Landscape orientation with the screen turned clockwise.");
                         break;
 
                     case 90:
-                        alert('landscape mode screen turned to the left');
+                        viewModel.orientation("landscape mode screen turned to the left");
                         break;
 
                     case -90:
-                        alert('landscape mode screen turned to the right');
+                        viewModel.orientation("landscape mode screen turned to the right");
                         break;
 
+                    case 180:
+                        viewModel.orientation("Portrait orientation with the screen turned upside down. This value is currently not supported on iPhone.");
+                        break;
                 }
+            });
         });
 
         
@@ -91,6 +110,10 @@
 
     <div>
         Document Outer Height <span data-bind="text: outerHeight"></span> px
+    </div>
+
+    <div>
+        Orientation <span data-bind="text: orientation"></span> px
     </div>
 </div>
 
