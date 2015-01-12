@@ -259,7 +259,7 @@ namespace DominoesWithCompadres.Models
             //if everone has passed, then end game
             if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
             {
-                //TODO 25: game finished, not just round
+                //TODO 25: need to make this a new state and add a correct message
                 this.State = GameState.RoundFinished;
                 InitializeRound();
             }
