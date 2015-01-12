@@ -100,6 +100,11 @@ input[type="checkbox"].input-validation-error {
     padding:0px;
     background-color:white;
     border:1px solid black;
+
+    /*TODO-later: blg about this 
+        http://stackoverflow.com/questions/3705937/document-click-not-working-correctly-on-iphone-jquery
+        */
+    cursor: pointer;
 }
 
 .one{
@@ -160,10 +165,12 @@ input[type="checkbox"].input-validation-error {
 
 #selectTiles > .selected, .selected > tileHalf{
     background-color:#4cff00;
+    border-color: #4cff00;
 }
 
 #selectTiles > .otherSelected, .otherSelected > tileHalf{
     background-color:#808080;
+    border-color:#808080;
 }
 
 .droppableTileZone

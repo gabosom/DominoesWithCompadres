@@ -239,6 +239,7 @@
     <Content Include="Views\Game\Start.cshtml" />
     <Content Include="Views\Shared\_LayoutWithAngular.cshtml" />
     <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Shared\_DominoGameLayout.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -116,7 +116,8 @@
                 self.mySelectedTile(selectedTile);
 
                 //TODO 2: if user clicks a selected tile, it should unselect and hide possible plays
-                $(".myTileContainer > div[data-tileId='" + selectedTile.id+ "'").addClass("selected");
+                $(".myTileContainer > div[data-tileid='" + selectedTile.id+ "']").addClass("selected");
+
 
                 //show where the selected tile can be placed                
                 showPossibleTilePlays(selectedTile);
@@ -183,21 +184,21 @@
     };
 
     gameHub.client.otherUserTookTile = function (tileId) {
-        $("div[data-tileId='" + tileId + "'").addClass("otherSelected");
+        $("div[data-tileid='" + tileId + "']").addClass("otherSelected");
     };
 
     //selected tile result
     gameHub.client.iTookTile = function (tileId, success) {
         if(success)
         {
-            $("div[data-tileId='" + tileId + "'").addClass("selected");
+            $("div[data-tileid='" + tileId + "']").addClass("selected");
             viewModel.addRoundTile(tileId);
         }
         else
         {
             //TODO 3: animation for taken
             tilesInRoundClient--;
-            $("div[data-tileId='" + tileId + "'").addClass("otherSelected");
+            $("div[data-tileid='" + tileId + "']").addClass("otherSelected");
         }
     };
 
@@ -355,9 +356,9 @@
             $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
 
             //set positioning
-            positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileId='" + firstTile.id + "']", "first");
+            positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileid='" + firstTile.id + "']", "first");
 
-            positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileId='" + lastTile.id + "']", "last");
+            positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileid='" + lastTile.id + "']", "last");
         }
     }
 
@@ -618,7 +619,7 @@
             //set as the first, then anchor it
             viewModel.firstPlayedTile(viewModel.mySelectedTile());
 
-            $(".roundTileBoard > .tile[data-tileId='" + tile.id + "']").addClass("firstTilePlayed");
+            $(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").addClass("firstTilePlayed");
 
             //put it in the middle
             $(".firstTilePlayed").position({
@@ -764,7 +765,7 @@
             if (!$(this).hasClass("selected") && !$(this).hasClass("otherSelected"))
             {
                 if (viewModel.myRoundTiles().length < 7 && tilesInRoundClient < 7) {
-                    var selectedTileId = $(this).attr("data-tileId");
+                    var selectedTileId = $(this).attr("data-tileid");
                     gameHub.server.selectedTile(gameCode, selectedTileId);
                 }
 
