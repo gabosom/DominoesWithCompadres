@@ -39,7 +39,7 @@
 
 
             <div class="roundTileBoard" data-bind="foreach: playedTiles">
-                <div class="tile" data-bind="attr: {'data-tileId' : id}, click: $parent.selectMyTile, css: $parent.getTilesDropClasses($data)">
+                <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
                     <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                     <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
                 </div>
