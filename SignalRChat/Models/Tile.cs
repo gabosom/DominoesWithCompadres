@@ -14,6 +14,6 @@ namespace DominoesWithCompadres.Models
         public int Value2 { get; set; }
         [JsonProperty("id")]
         public int ID { get; set; }
-        //TODO: Generate IDs so users can't inspect tiles when shuffling
+        //TODO 26: Generate IDs so users can't inspect tiles when shuffling
     }
 }

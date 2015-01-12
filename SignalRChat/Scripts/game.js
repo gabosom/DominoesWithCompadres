@@ -392,11 +392,11 @@
         $(drop).click(function () {
 
             var listPosition = $(this).attr("data-listposition"); 
-            //TODO: find a better way to find if the drop target should be actionable
+            //TODO 27: find a better way to find if the drop target should be actionable
             //maybe check if the selectedTile's class matches the drop targets class
             if ($(this).css("visibility") == "visible")
             {
-                //TODO: validate that the domino is droppable in the dropzone
+                //TODO 28: validate that the domino is droppable in the dropzone
 
                 //remove the selectedTile from myTiles and add it to played game
                 viewModel.myRoundTiles.remove(viewModel.mySelectedTile());
@@ -404,12 +404,11 @@
                 var tilePlayed = playTileOnBoard(viewModel.mySelectedTile(), listPosition);
 
 
-                //TODO: alert server of play
                 gameHub.server.userPlayedTile(gameCode, tilePlayed, listPosition)
                 userInTurn = false;
                 
 
-                //TODO: enforce turn bool during moves
+                //TODO 29: enforce turn bool during moves
                 //empty selection, destroy droppables, & endturn
                 viewModel.mySelectedTile({});                
                 $(".droppableTileZone").remove();
@@ -429,7 +428,7 @@
         //start loop until tile is correct
         var isTilePlacedCorrectly = false;
 
-        //TODO: work out that this doesn't cycle forever 
+        //TODO 30: work out that this doesn't cycle forever 
         var tries = 0;
         while(!isTilePlacedCorrectly)
         {
@@ -608,8 +607,7 @@
     //tile is a tile object, listPosition is either "first" or "last"
     function playTileOnBoard(tile, listPosition)
     {
-        //TODO: need to do this better when I figure out how to paint
-        //TODO: need to figure out what happens when joining mid game
+        //TODO 31: need to figure out what happens when joining mid game
         //when it's the first, need to anchor it to the middle
         if (viewModel.playedTiles().length == 0) {
 
@@ -642,7 +640,7 @@
                     viewModel.playedTiles.unshift(tile);
                     positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
 
-                    //TODO: make this cleaner, we shouldn't have to call playedTiles and positionTile twice for this method. 
+                    //TODO 32: make this cleaner, we shouldn't have to call playedTiles and positionTile twice for this method. 
                     //shift viewModel when appropriate
                     //have to special case 2 because for this particular case, we need to invert the divs in the tiles and keep the values in hte viewModel the same
                     if (
@@ -669,7 +667,7 @@
                     //TODO: find a better place for this logic
                     //when the tile is done, I need to make sure the tiles only curve once to fit more
                     if (list_firstDirectionIndex % 2 == 1)
-                        list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
+                        list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
 
                 } break;
 
@@ -702,7 +700,7 @@
                     }
 
                     if (list_lastDirectionIndex % 2 == 1)
-                        list_firstDirectionIndex = ++list_firstDirectionIndex % 4;
+                        list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
 
                 } break;
             }

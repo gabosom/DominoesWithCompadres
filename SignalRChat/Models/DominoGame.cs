@@ -33,9 +33,9 @@ namespace DominoesWithCompadres.Models
             //this.InitializeRound();
         }
 
-        //TODO: generate tiles on Round start
         private void GenerateTiles()
         {
+            //TODO 20: shuffle tiles
             this.AvailableTiles.Clear();
 
             //TODO 18: generate the right tile IDs
@@ -59,7 +59,6 @@ namespace DominoesWithCompadres.Models
             //randomly determine who starts 
             Random rand = new Random((int)DateTime.Now.Ticks);
             
-            //TODO: check if this will also get the last player to be first, not sure if it will
             this.CurrentRound.PlayerInTurn = rand.Next(this.Players.Count);
         }
 
@@ -122,7 +121,6 @@ namespace DominoesWithCompadres.Models
 
         public void PlayerReady(string ConnectionId)
         {
-            //TODO: add variable to have isEveryoneReady as a variable instead of a method that always runs
             if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created)
             {
                 this.State = GameState.WaitingUsersReady;
@@ -131,7 +129,6 @@ namespace DominoesWithCompadres.Models
                 InitializeRound();
             }
 
-            //TODO:if gamestate is roundfinished or finished, need to update to waitingusersready
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
         }
@@ -192,7 +189,6 @@ namespace DominoesWithCompadres.Models
             this.State = GameState.InProgress;
         }
 
-        //TODO: make this a variable per user so it's more efficient
         internal bool ReadyForRoundStart()
         {
             return this.ReadyForRound;
@@ -212,11 +208,11 @@ namespace DominoesWithCompadres.Models
 
             Player curPlayer = this.GetPlayer(playerConnectionId);
 
-            //TODO: null expception
+            //TODO 23: null expception
             //get tile to be played
             Tile tilePlayed = curPlayer.Tiles.Single(t => t.ID == tile.ID);
 
-            //TODO; make sure that values from the tile played are passed to server tile, it can switch on the client
+            //TODO 24: make sure that the value we get from the client is updated here, the client can rotate the tiles if needed
 
             //remove tile from user's active tile
             curPlayer.Tiles.Remove(tilePlayed);
@@ -244,7 +240,7 @@ namespace DominoesWithCompadres.Models
             }
             else
             {
-                //TODO: game finished, not just round
+                //TODO 25: game finished, not just round
                 this.State = GameState.RoundFinished;
                 InitializeRound();
             }
@@ -264,7 +260,7 @@ namespace DominoesWithCompadres.Models
             //if everone has passed, then end game
             if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
             {
-                //TODO: game finished, not just round
+                //TODO 25: game finished, not just round
                 this.State = GameState.RoundFinished;
                 InitializeRound();
             }

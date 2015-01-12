@@ -39,7 +39,7 @@ namespace DominoesWithCompadres.Hubs
             //TODO 14 try/catch
             DominoGame game = GameService.Get(gameCode);
 
-            //TODO try/catch
+            //TODO #19 try/catch
             game.PlayerReady(Context.ConnectionId);
 
 
@@ -48,7 +48,6 @@ namespace DominoesWithCompadres.Hubs
                 Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
             }
-            //TODO: need to shuffle and send available tiles
 
         }
     
@@ -100,8 +99,8 @@ namespace DominoesWithCompadres.Hubs
             {
                 game.PlayerPassTurn(Context.ConnectionId);
 
-                //TODO: send message to clients to show something like a pass message
-                //TODO: Round over when all players pass
+                //TODO 21: send message to clients to show something like a pass message
+                //TODO 22: Round over when all players pass
                 Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
             }
 
