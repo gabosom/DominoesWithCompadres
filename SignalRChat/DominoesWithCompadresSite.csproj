@@ -202,12 +202,8 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <None Include="Properties\PublishProfiles\dominoeswithcompadres - FTP %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\dominoeswithcompadres - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\dominoeswithcompadres - Web Deploy %282%29.pubxml" />
     <None Include="Properties\PublishProfiles\dominoeswithcompadres - Web Deploy.pubxml" />
-    <None Include="Properties\PublishProfiles\testsportscontent - FTP.pubxml" />
-    <None Include="Properties\PublishProfiles\testsportscontent - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
