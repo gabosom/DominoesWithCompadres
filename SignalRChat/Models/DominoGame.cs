@@ -242,7 +242,6 @@ namespace DominoesWithCompadres.Models
             {
                 //TODO 25: game finished, not just round
                 this.State = GameState.RoundFinished;
-                InitializeRound();
             }
 
             return true;

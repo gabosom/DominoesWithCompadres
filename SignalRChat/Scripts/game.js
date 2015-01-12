@@ -652,7 +652,7 @@
                     viewModel.playedTiles.unshift(tile);
                     positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
 
-                    //TODO: find a better place for this logic
+                    //TODO 33: find a better place for this logic
                     //when the tile is done, I need to make sure the tiles only curve once to fit more
                     if (list_firstDirectionIndex % 2 == 1)
                         list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
@@ -691,7 +691,6 @@
     //section "round for gameplay, select for shuffle"
     function getTileForId(section, tileId)
     {
-        //TODO: finish select for section
         switch(section)
         {
             case "round":
@@ -734,8 +733,7 @@
     ///need to check with server if no one else has selected that one
     function setSelectableTiles() {
 
-        //TODO: make tiles draggable
-        //TODO: this is getting called twice because I call setSelectableTIles twice
+        //TODO 34: make tiles draggable
         //$("#selectTiles > .tile").draggable();
 
         $("#selectTiles > .tile").click(function () {
@@ -755,7 +753,7 @@
     /***** gameplay *****/
     function initializeRound()
     {
-        //TODO: set the correct size for roundTileBoard, for now it's hardcoded
+        //TODO 35: set the correct size for roundTileBoard, for now it's hardcoded
 
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
@@ -795,7 +793,7 @@
                     $(".state").hide();
                     $(".gameInProgress").show();
 
-                    //TODO: will need to refactor this once I have a table/viewer mode only
+                    //TODO 37: will need to refactor this once I have a table/viewer mode only
                     initializeRound();
                 } break;
         }
@@ -804,7 +802,7 @@
     }
 
     $(".btnPassTurn").click(function () {
-        //TODO: only do this when in turn
+        //TODO 38: only do this when in turn
 
         gameHub.server.userPlayedTile(gameCode, null, null)
     });
