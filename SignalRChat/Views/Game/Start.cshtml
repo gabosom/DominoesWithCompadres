@@ -33,9 +33,19 @@
         <div class="state gameInProgress">
 
             <div class="mobile_playabbleContainer">
-                <div class="mobile_playabbleArea mobile_playLast"></div>
+                <div class="mobile_playabbleArea mobile_playLast" data-bind="foreach: mobile_lastPlayedTile">
+                    <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
+                    </div>
+                </div>
                 <div class="mobile_info"></div>
-                <div class="mobile_playabbleArea mobile_playFirst"></div>
+                <div class="mobile_playabbleArea mobile_playFirst" data-bind="foreach: mobile_firstPlayedTile">
+                    <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="myTileAndMoveArea">

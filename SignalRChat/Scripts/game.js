@@ -41,6 +41,8 @@
         self.message = ko.observable();
         self.isUserSmallScreen = ko.observable();
         self.screenOrientation = ko.observable();
+        self.mobile_lastPlayedTile = ko.observableArray();
+        self.mobile_firstPlayedTile = ko.observableArray();
         
 
         this.initializeViewModel = function (game) {
@@ -150,11 +152,28 @@
                     classToAdd = "six"; break;
             }
             return classToAdd;
-        }
+        };
 
         self.setPlayerInTurn = function (playerPositon) {
             this.playerInTurn(playerPositon);
-        }
+        };
+
+        self.mobile_addTile = function (tile, listPosition)        {
+            switch(listPosition)
+            {
+                case "first":
+                    {
+                        self.mobile_firstPlayedTile.removeAll();
+                        self.mobile_firstPlayedTile.push(tile);
+                    }; break;
+
+                case "last":
+                    {
+                        self.mobile_lastPlayedTile.removeAll();
+                        self.mobile_lastPlayedTile.push(tile);
+                    }break;
+            }
+        };
     };
 
     var viewModel = new ViewModel();
@@ -326,41 +345,87 @@
 
     function generateDroppableZonesForPlays() {
 
-        //if the board is empty
-        if (viewModel.playedTiles().length == 0) {
+
+        if (!viewModel.isUserSmallScreen())
+        {        
+            //if the board is empty
+            if (viewModel.playedTiles().length == 0) {
             
-            //generate tile droppable zone and add it
-            var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "first")
+                //generate tile droppable zone and add it
+                var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "first")
 
-            $(".roundTileBoard").append(dropTarget);
+                $(".roundTileBoard").append(dropTarget);
 
 
-            //put it in the middle
-            $(dropTarget).position({
-                of: $(".roundTileBoard"),
-                my: "center",
-                at: "center"
-            });
+                //put it in the middle
+                $(dropTarget).position({
+                    of: $(".roundTileBoard"),
+                    my: "center",
+                    at: "center"
+                });
 
+            }
+            //there are tiles in play
+            //there are always two: first/last
+            else {
+                var firstTile = viewModel.playedTiles()[0];
+                var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
+
+                var firstOpenValue = getOpenValue("first");
+                var lastOpenValue = getOpenValue("last");
+
+                var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
+                var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
+
+                $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
+
+                //set positioning
+                positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileid='" + firstTile.id + "']", "first");
+
+                positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileid='" + lastTile.id + "']", "last");
+            }
         }
-        //there are tiles in play
-        //there are always two: first/last
-        else {
-            var firstTile = viewModel.playedTiles()[0];
-            var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-            var firstOpenValue = getOpenValue("first");
-            var lastOpenValue = getOpenValue("last");
+        //small screen interaction
+        else
+        {
+            //if the board is empty
+            if(viewModel.playedTiles().length == 0)
+            {
+                var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
+                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
 
-            var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
-            var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
+                //add left and add right, they both work
+                $(".mobile_playLast").append(firstDropTarget);
+                $(".mobile_playFirst").append(lastDropTarget);
 
-            $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
+                $(firstDropTarget).position({
+                    of: $(".mobile_playFirst"),
+                    my: "center",
+                    at: "center"
+                });
 
-            //set positioning
-            positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileid='" + firstTile.id + "']", "first");
+                $(lastDropTarget).position({
+                    of: $(".mobile_playLast"),
+                    my: "center",
+                    at: "center"
+                });
+            }
+            else
+            {
+                var firstOpenTile = viewModel.mobile_firstPlayedTile()[0];
+                var lastOpenTile = viewModel.mobile_lastPlayedTile()[0];
 
-            positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileid='" + lastTile.id + "']", "last");
+                var firstDropTarget = createDroppableTarget(firstOpenTile.value1, "first");
+                var lastDropTarget = createDroppableTarget(lastOpenTile.value2, "last");
+
+                //add left and add right, they both work
+                $(".mobile_playFirst").append(firstDropTarget);
+                $(".mobile_playLast").append(lastDropTarget);
+
+                positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstOpenTile.id + "']", "first");
+                positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastOpenTile.id + "']", "last");
+            }
         }
     }
 
@@ -383,12 +448,21 @@
         var drop = document.createElement("div");
         $(drop).addClass("tile").addClass("droppableTileZone").attr("data-listPosition", listPosition);
 
-        for(i = 0; i < acceptsValues.length; i++)
-        {
-            var dropClass = getDropClassForValue(acceptsValues[i]);
 
+        if (Array.isArray(acceptsValues))
+        {
+            for (i = 0; i < acceptsValues.length; i++) {
+                var dropClass = getDropClassForValue(acceptsValues[i]);
+
+                $(drop).addClass(dropClass);
+            }
+        }
+        else
+        {
+            var dropClass = getDropClassForValue(acceptsValues);
             $(drop).addClass(dropClass);
         }
+        
 
         //attach events to the drop target
         $(drop).click(function () {
@@ -424,178 +498,203 @@
     
     function positionTileOnBoard(selector, anchorSelector, listPosition)
     {
-
-        var allTileContainer = ".roundTileBoard";
-
-        //start loop until tile is correct
-        var isTilePlacedCorrectly = false;
-
-        //TODO 30: work out that this doesn't cycle forever 
-        var tries = 0;
-        while(!isTilePlacedCorrectly)
+        //if on big computer
+        if (!viewModel.isUserSmallScreen())
         {
+            var allTileContainer = ".roundTileBoard";
 
-            //NOTE: I tried making this generic, but every position for first and last is different. 
-            //need to have this completely independent
-            if (listPosition == "first")
+            //start loop until tile is correct
+            var isTilePlacedCorrectly = false;
+
+            //TODO 30: work out that this doesn't cycle forever 
+            var tries = 0;
+            while(!isTilePlacedCorrectly)
             {
-                switch(list_firstDirectionIndex)
+
+                //NOTE: I tried making this generic, but every position for first and last is different. 
+                //need to have this completely independent
+                if (listPosition == "first")
                 {
-                    case 0:
-                        {
-                            $(selector).removeClass("horizontal");
+                    switch(list_firstDirectionIndex)
+                    {
+                        case 0:
+                            {
+                                $(selector).removeClass("horizontal");
 
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "center bottom",
-                                at: "center top",
-                                collision: "none"
-                            });
-                        } break;
-                    case 1:
-                        {
-                            $(selector).addClass("horizontal");
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "center bottom",
+                                    at: "center top",
+                                    collision: "none"
+                                });
+                            } break;
+                        case 1:
+                            {
+                                $(selector).addClass("horizontal");
 
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "left top",
-                                at: "right top",
-                                collision: "none"
-                            });
-                        } break;
-                    case 2:
-                        {
-                            //just in this case, I need to invert both divs with the values
-                            $(selector).removeClass("horizontal");
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "left top",
+                                    at: "right top",
+                                    collision: "none"
+                                });
+                            } break;
+                        case 2:
+                            {
+                                //just in this case, I need to invert both divs with the values
+                                $(selector).removeClass("horizontal");
 
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "right top",
-                                at: "right bottom",
-                                collision: "none"
-                            });
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "right top",
+                                    at: "right bottom",
+                                    collision: "none"
+                                });
 
                             
-                            //invert tile value div positions
-                            invertTileValueDivs(selector);
-                        } break;
+                                //invert tile value div positions
+                                invertTileValueDivs(selector);
+                            } break;
 
-                    case 3:
-                        {
-                            $(selector).addClass("horizontal");
+                        case 3:
+                            {
+                                $(selector).addClass("horizontal");
 
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "left bottom",
-                                at: "right bottom",
-                                collision: "none"
-                            });
-                        } break;
-                }
-            }
-
-            else
-            {
-                switch (list_lastDirectionIndex)
-                {
-                    case 0:
-                        {
-                            $(selector).removeClass("horizontal");
-
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "center top",
-                                at: "center bottom",
-                                collision: "none"
-                            });
-                        } break;
-                    case 1:
-                        {
-                            $(selector).addClass("horizontal");
-
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "right bottom",
-                                at: "left bottom",
-                                collision: "none"
-                            });
-                        } break;
-                    case 2:
-                        {
-                            $(selector).removeClass("horizontal");
-
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "left bottom",
-                                at: "left top",
-                                collision: "none"
-                            });
-
-                            invertTileValueDivs(selector);
-                        } break;
-
-                    case 3:
-                        {
-                            $(selector).addClass("horizontal");
-
-                            $(selector).position({
-                                of: $(anchorSelector),
-                                my: "right top",
-                                at: "left top",
-                                collision: "none"
-                            });
-                        } break;
-                }
-            }
-
-        
-            var containerOffset = $(allTileContainer).offset();
-            var containerPosition = $(allTileContainer).position();
-            var containerLeft = $(allTileContainer).css("left");
-            var containerTOp = $(allTileContainer).css("top");
-            var tileOffset = $(selector).offset();
-            var tilePosition = $(selector).position();
-            var tileLeft = $(selector).css("left");
-            var tileTop = $(selector).css("top");
-
-
-
-            //check if the piece is not inside
-            if (
-                tilePosition.left < containerPosition.left ||
-                tilePosition.left + $(selector).outerWidth(false) > containerPosition.left + $(allTileContainer).innerWidth() ||
-                tilePosition.top < containerPosition.top ||
-                tilePosition.top + $(selector).outerHeight(false) > containerPosition.top + $(allTileContainer).innerHeight()
-                )
-            {
-                //turning logic
-
-                //turns up, right, down, right
-                if(listPosition == "first")
-                {
-                    list_firstDirectionIndex = ++list_firstDirectionIndex%4;
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "left bottom",
+                                    at: "right bottom",
+                                    collision: "none"
+                                });
+                            } break;
+                    }
                 }
 
-                    //turns down left up left
                 else
                 {
-                    list_lastDirectionIndex = ++list_lastDirectionIndex % 4;
+                    switch (list_lastDirectionIndex)
+                    {
+                        case 0:
+                            {
+                                $(selector).removeClass("horizontal");
+
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "center top",
+                                    at: "center bottom",
+                                    collision: "none"
+                                });
+                            } break;
+                        case 1:
+                            {
+                                $(selector).addClass("horizontal");
+
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "right bottom",
+                                    at: "left bottom",
+                                    collision: "none"
+                                });
+                            } break;
+                        case 2:
+                            {
+                                $(selector).removeClass("horizontal");
+
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "left bottom",
+                                    at: "left top",
+                                    collision: "none"
+                                });
+
+                                invertTileValueDivs(selector);
+                            } break;
+
+                        case 3:
+                            {
+                                $(selector).addClass("horizontal");
+
+                                $(selector).position({
+                                    of: $(anchorSelector),
+                                    my: "right top",
+                                    at: "left top",
+                                    collision: "none"
+                                });
+                            } break;
+                    }
                 }
-            }
 
-                //it's inside
-            else
-            {
-                isTilePlacedCorrectly = true;
-            }
+        
+                var containerOffset = $(allTileContainer).offset();
+                var containerPosition = $(allTileContainer).position();
+                var containerLeft = $(allTileContainer).css("left");
+                var containerTOp = $(allTileContainer).css("top");
+                var tileOffset = $(selector).offset();
+                var tilePosition = $(selector).position();
+                var tileLeft = $(selector).css("left");
+                var tileTop = $(selector).css("top");
 
-            tries++;
-            if(tries == 3)
-            {
-                alert('salio con error')
-                isTilePlacedCorrectly = true;
+
+
+                //check if the piece is not inside
+                if (
+                    tilePosition.left < containerPosition.left ||
+                    tilePosition.left + $(selector).outerWidth(false) > containerPosition.left + $(allTileContainer).innerWidth() ||
+                    tilePosition.top < containerPosition.top ||
+                    tilePosition.top + $(selector).outerHeight(false) > containerPosition.top + $(allTileContainer).innerHeight()
+                    )
+                {
+                    //turning logic
+
+                    //turns up, right, down, right
+                    if(listPosition == "first")
+                    {
+                        list_firstDirectionIndex = ++list_firstDirectionIndex%4;
+                    }
+
+                        //turns down left up left
+                    else
+                    {
+                        list_lastDirectionIndex = ++list_lastDirectionIndex % 4;
+                    }
+                }
+
+                    //it's inside
+                else
+                {
+                    isTilePlacedCorrectly = true;
+                }
+
+                tries++;
+                if(tries == 3)
+                {
+                    alert('salio con error')
+                    isTilePlacedCorrectly = true;
+                }
+                //isTilePlacedCorrectly = true;
             }
-            //isTilePlacedCorrectly = true;
+        }
+        else
+        {
+            switch(listPosition)
+            {
+                case "first": {
+                    $(selector).position({
+                        of: $(anchorSelector),
+                        my: "left",
+                        at: "right",
+                        collision: "none"
+                    });
+                } break;
+                case "last": {
+                    $(selector).position({
+                        of: $(anchorSelector),
+                        my: "right",
+                        at: "left",
+                        collision: "none"
+                    });
+                } break;
+            }
         }
     }
 
@@ -619,14 +718,34 @@
             //set as the first, then anchor it
             viewModel.firstPlayedTile(viewModel.mySelectedTile());
 
-            $(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").addClass("firstTilePlayed");
+            if(!viewModel.isUserSmallScreen())
+            {
+                $(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").addClass("firstTilePlayed");
 
-            //put it in the middle
-            $(".firstTilePlayed").position({
-                of: $(".roundTileBoard"),
-                my: "center",
-                at: "center"
-            });
+                //put it in the middle
+                $(".firstTilePlayed").position({
+                    of: $(".roundTileBoard"),
+                    my: "center",
+                    at: "center"
+                });
+            }
+            else
+            {
+                viewModel.mobile_addTile(tile, "first");
+                viewModel.mobile_addTile(tile, "last");
+
+                $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+                    of: $(".mobile_playFirst"),
+                    my: "left",
+                    at: "left"
+                });
+
+                $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                    of: $(".mobile_playLast"),
+                    my: "right",
+                    at: "right"
+                });
+            }
         }
 
         else
@@ -650,14 +769,28 @@
                         tile.value2 = tempValue;
                     }
 
-                    //removed and added new tile
+                    //added new tile
                     viewModel.playedTiles.unshift(tile);
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
 
-                    //TODO 33: find a better place for this logic
-                    //when the tile is done, I need to make sure the tiles only curve once to fit more
-                    if (list_firstDirectionIndex % 2 == 1)
-                        list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
+                    if (!viewModel.isUserSmallScreen()) {
+
+                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']", listPosition);
+
+                        //TODO 33: find a better place for this logic
+                        //when the tile is done, I need to make sure the tiles only curve once to fit more
+                        if (list_firstDirectionIndex % 2 == 1)
+                            list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
+                    }
+                    else
+                    {
+                        viewModel.mobile_addTile(tile, "first");
+
+                        $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+                            of: $(".mobile_playFirst"),
+                            my: "left",
+                            at: "left"
+                        });
+                    }
 
                 } break;
 
@@ -676,13 +809,26 @@
                         tile.value2 = tempValue; 
                     }
 
-                    //removed and added new tile
+                    //added new tile
                     viewModel.playedTiles.push(tile);
-                    positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
 
-                    if (list_lastDirectionIndex % 2 == 1)
-                        list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
+                    if (!viewModel.isUserSmallScreen()) {
 
+                        positionTileOnBoard(".roundTileBoard > .tile[data-tileid='" + tile.id + "']", ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length - 2].id + "']", listPosition);
+
+                        if (list_lastDirectionIndex % 2 == 1)
+                            list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
+                    }
+                    else
+                    {
+                        viewModel.mobile_addTile(tile, "last");
+
+                        $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                            of: $(".mobile_playLast"),
+                            my: "right",
+                            at: "right"
+                        });
+                    }
                 } break;
             }
         }
@@ -858,8 +1004,6 @@
         {
             viewModel.isUserSmallScreen(false);
         }
-
-        alert(screenWidth + " " + viewModel.isUserSmallScreen()); 
     }
 
 
