@@ -7,7 +7,7 @@
 
 @using (Html.BeginForm("Start", "Game", FormMethod.Post))
 {
-    @Html.TextBoxFor(model => model.Create_UserDisplayName, new{id = "create_displayName", Name= "create_displayName"})
+    @Html.TextBoxFor(model => model.Create_UserDisplayName, new{id = "create_displayName"})
     @Html.ValidationMessageFor(model => model.Create_UserDisplayName, "*");
     <br />
 

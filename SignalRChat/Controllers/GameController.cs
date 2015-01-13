@@ -48,10 +48,8 @@ namespace DominoesWithCompadres.Controllers
 
                     ViewBag.DisplayName = GameStartDetails.Create_UserDisplayName;
                     ViewBag.UserType = GameStartDetails.UserType.ToString();
-
-                     
-                        DominoGame newGame = GameService.CreateGame();
-                        return View(newGame);
+                    DominoGame newGame = GameService.CreateGame();
+                    return View(newGame);
                     
                 }
                 catch
