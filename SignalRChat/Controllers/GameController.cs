@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using DominoesWithCompadres.Models;
 using DominoesWithCompadres.Utils;
+using DominoesWithCompadres.Models.ViewModel;
 
 namespace DominoesWithCompadres.Controllers
 {
@@ -37,24 +38,65 @@ namespace DominoesWithCompadres.Controllers
         // POST: /Game/Create
         [HttpPost]
         //public ActionResult Create(FormCollection collection)
-        public ActionResult Start(DominoesWithCompadres.Models.ViewModel.GameStart GameStartDetails)
+        public ActionResult Start(CreateGame GameStartDetails)
         {
-            try
-            {
-                //TODO 10: if model is incomplete, then redirect with error
-
-                //TODO 11: make sure the gamecode is always caps
-
-                ViewBag.DisplayName = GameStartDetails.UserDisplayName;
-                ViewBag.UserType = GameStartDetails.UserType.ToString();
-
-                if(GameStartDetails.UserAction.Equals("newGame"))
-                { 
-                    DominoGame newGame = GameService.CreateGame();
-                    return View(newGame);
-                }
-                else
+            if(ModelState.IsValid)
+            { 
+                try
                 {
+                    //TODO 10: if model is incomplete, then redirect with error
+
+                    //TODO 11: make sure the gamecode is always caps
+
+                    ViewBag.DisplayName = GameStartDetails.UserDisplayName;
+                    ViewBag.UserType = GameStartDetails.UserType.ToString();
+
+                     
+                        DominoGame newGame = GameService.CreateGame();
+                        return View(newGame);
+                    
+                    /* Save this for the join
+                        DominoGame existingGame = GameService.Get(GameStartDetails.GameCode);
+                        if(existingGame != null)
+                        {
+                            return View(existingGame);
+                        }
+                        else
+                        {
+                            //TODO 12
+                            throw new Exception("Game doesn't exist");
+                        }
+                    }*/
+                }
+                catch
+                {
+                    return View("../Home/Index", GameStartDetails);
+                }
+            }
+            else
+            {
+                return View("../Home/Index", new JoinOrCreateGameModel()
+                {
+                    createGame = GameStartDetails
+                });
+            }
+        }
+
+
+        public ActionResult Join(JoinGame GameStartDetails)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //TODO 10: if model is incomplete, then redirect with error
+
+                    //TODO 11: make sure the gamecode is always caps
+
+                    ViewBag.DisplayName = GameStartDetails.UserDisplayName;
+                    ViewBag.UserType = GameStartDetails.UserType.ToString();
+
+
                     DominoGame existingGame = GameService.Get(GameStartDetails.GameCode);
                     if(existingGame != null)
                     {
@@ -65,15 +107,21 @@ namespace DominoesWithCompadres.Controllers
                         //TODO 12
                         throw new Exception("Game doesn't exist");
                     }
+                    
+                }
+                catch
+                {
+                    return View("../Home/Index", GameStartDetails);
                 }
             }
-            catch
+            else
             {
-                return View();
+                return View("../Home/Index", new JoinOrCreateGameModel()
+                {
+                    joinGame = GameStartDetails
+                });
             }
         }
-
-        
 
         //
         // GET: /Game/Delete/5

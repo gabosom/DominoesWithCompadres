@@ -1,7 +1,9 @@
-﻿@model DominoesWithCompadres.Models.ViewModel.GameStart
+﻿@model DominoesWithCompadres.Models.ViewModel.JoinOrCreateGameModel
 
 @{
     ViewBag.Title = "Home Page";
+    
+    /*** TODO: the radiobutton helper creates items with the same id. this should be fixed... ***/
 }
 
 <div class="jumbotron">
@@ -12,35 +14,26 @@
 <div class="row">
     <div class="col-md-4">
         <h2>Start a Game</h2>
-        @using (Html.BeginForm("Start", "Game", FormMethod.Post))
+        
+        @if(Model == null || Model.createGame == null)
         {
-            <input type="hidden" name="userAction" value="newGame" />
-            <input type="text" name="userDisplayName" />
-            <br />
-            foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
-                @Html.Label(value)
-                @Html.RadioButtonFor(model => model.UserType, value)
-            }
-            <br />
-            <input type="submit" value="Create" />
+            @Html.Partial("../Home/CreateGame", new DominoesWithCompadres.Models.ViewModel.CreateGame())
+        }
+        else
+        {
+            @Html.Partial("../Home/CreateGame", Model.createGame)
         }
         
     </div>
     <div class="col-md-4">
         <h2>Join Existing Game</h2>
-        @using (Html.BeginForm("Start", "Game", FormMethod.Post))
+        @if (Model == null || Model.joinGame == null)
         {
-            <input type="hidden" name="userAction" value="existingGame" />
-            <span>GameCode</span> <input type="text" name="gameCode" />
-                <br/>
-            <span>DisplayName</span> <input type="text" name="userDisplayName" />
-            <br />
-            foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
-                @Html.Label(value)
-                @Html.RadioButtonFor(model => model.UserType, value)
-            }
-            <br />
-            <input type="submit" value="Create" />
+            @Html.Partial("../Home/JoinGame", new DominoesWithCompadres.Models.ViewModel.JoinGame())
+        }
+        else
+        {
+            @Html.Partial("../Home/JoinGame", Model.joinGame)
         }
     </div>
     <div class="col-md-4">

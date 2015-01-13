@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -9,6 +10,8 @@ namespace DominoesWithCompadres.Models.ViewModel
     {
         private string _GameCode;
         public string UserAction { get; set; }
+        [Required]
+        [StringLength(15, MinimumLength=1)]
         public string UserDisplayName { get; set; }
         public string GameCode { 
             get{
@@ -18,8 +21,47 @@ namespace DominoesWithCompadres.Models.ViewModel
                 this._GameCode = (string)value.ToUpper();
             }
         }
+        [Required]
         public UserType UserType { get; set; }
 
+    }
+
+    public class JoinGame
+    {
+        private string _GameCode;
+        [Required]
+        [StringLength(15, MinimumLength = 1)]
+        public string UserDisplayName { get; set; }
+        [Required]
+        [StringLength(4)]
+        public string GameCode
+        {
+            get
+            {
+                return this._GameCode;
+            }
+            set
+            {
+                this._GameCode = (string)value.ToUpper();
+            }
+        }
+        [Required]
+        public UserType UserType { get; set; }
+    }
+
+    public class CreateGame
+    {
+        [Required]
+        [StringLength(15, MinimumLength = 1)]
+        public string UserDisplayName { get; set; }
+        [Required]
+        public UserType UserType { get; set; }
+    }
+
+    public class JoinOrCreateGameModel
+    {
+        public JoinGame joinGame { get; set; }
+        public CreateGame createGame { get; set; }
     }
 
     public enum UserType

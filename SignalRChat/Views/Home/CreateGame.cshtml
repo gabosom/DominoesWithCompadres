@@ -1,0 +1,25 @@
+﻿@model DominoesWithCompadres.Models.ViewModel.CreateGame
+
+@using (Html.BeginForm("Start", "Game", FormMethod.Post))
+{
+    @Html.TextBoxFor(model => model.UserDisplayName, new{id = "create_displayName"})
+    @Html.ValidationMessageFor(model => model.UserDisplayName, "*");
+    <br />
+
+    bool first = true;
+    foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
+    {
+        @Html.Label(value)
+        if (first)
+        {
+        @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
+            first = false;
+        }
+        else
+        {
+        @Html.RadioButtonFor(model => model.UserType, value)
+        }
+    }
+    <br />
+    <input type="submit" value="Create" />
+}
