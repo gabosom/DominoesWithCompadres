@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <div>GameCode: <span data-bind="text: gameCode"></span></div>
+    <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
 
     <input type="hidden" id="gameCode" value="@Model.GameCode" />
     <input type="hidden" id="userType" value="@ViewBag.UserType" />
@@ -31,6 +31,23 @@
         </div>
         
         <div class="state gameInProgress">
+
+            <div class="mobile_playabbleContainer">
+                <div class="mobile_playabbleArea mobile_playLast" data-bind="foreach: mobile_lastPlayedTile">
+                    <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
+                    </div>
+                </div>
+                <div class="mobile_info"></div>
+                <div class="mobile_playabbleArea mobile_playFirst" data-bind="foreach: mobile_firstPlayedTile">
+                    <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
+                        <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="myTileAndMoveArea">
                 <div class="myTileContainer" data-bind="foreach: myRoundTiles">
                     <div class="tile" data-bind="attr: {'data-tileId' : id}, click: $parent.selectMyTile, css: $parent.getTilesDropClasses($data)">
@@ -40,7 +57,8 @@
                 </div>
                 <input type="button" value="pass" class="btnPassTurn" />
             </div>
-
+            
+            
 
             <div class="roundTileBoard" data-bind="foreach: playedTiles">
                 <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">

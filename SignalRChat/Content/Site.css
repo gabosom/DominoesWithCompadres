@@ -3,6 +3,8 @@
     padding-bottom: 20px;
 }
 
+
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -79,6 +81,7 @@ input[type="checkbox"].input-validation-error {
     visibility:visible;
     display:block;
     height:600px;
+    width:800px;
     position:absolute;
     top:0px;
     left:0px;
@@ -87,8 +90,8 @@ input[type="checkbox"].input-validation-error {
 .selectReadyContainer > .overlay
 {
     background-color: rgba(3, 3, 3, 0.81);
-    width:800px;
-    height: 600px;
+    width:100%;
+    height: 100%;
 }
 
 .selectReadyContainer > .overlay > .overlayContent
@@ -167,7 +170,6 @@ input[type="checkbox"].input-validation-error {
 
 .horizontal > .tileHalf:first-child{
     border-bottom: none;
-    border-right:1px solid black;
     border-left:1px solid black;
 }
 
@@ -241,4 +243,155 @@ input[type="checkbox"].input-validation-error {
 
 .btnPassTurn{
     visibility:hidden;
+}
+
+
+
+/*** Hide mobile stuff ***/
+.mobile_playabbleArea
+{
+    display:none;
+}
+
+
+/***** Mobile CSS *******/
+@media (min-width: 479px) and (max-width: 767px) {
+    .hideIfMobile
+    {
+        display:none;
+    }
+    
+    .roundTileBoard{
+        display:none;
+        clear:both;
+    }
+
+
+    /* Layout for mobile divs select */
+    .selectReadyContainer, .selectReadyContainer > .overlay
+    {
+        width:100%;
+        height:100%;
+    }
+
+        .selectReadyContainer > .overlay > .overlayContent 
+        {
+            height:50%;
+        }
+
+    /* Layout for mobile divs in game*/
+
+    .mobile_playabbleContainer
+    {
+        width: 100%;
+        height:50%;
+    }
+        .mobile_playabbleArea
+        {
+            height:50%;
+            display:block;
+            width:30%;
+        }
+
+        .mobile_playLast
+        {
+            float:left;
+            border:1px solid black;        
+        }
+
+        .mobile_playFirst
+        {
+            float:right;
+            border:1px solid blue;        
+        }
+        
+    .myTileAndMoveArea
+    {
+        width:100%;
+        height:50%;
+    }
+
+        .myTileAndMoveArea > .myTileContainer {
+            height:80px;
+        }
+
+    footer{
+        clear:both;
+        display:none;
+    }
+
+    .mobile_playabbleArea > .tile
+    {
+        width:60px;
+        height:30px;
+    }
+
+        .mobile_playabbleArea > .tile > div
+        {
+            float:right;
+            width:50%;
+            height:100%;
+        }
+
+            .mobile_playabbleArea > .tile > .tileHalf:first-child {
+                border-left:1px solid black;
+                border-bottom: none; 
+            }
+
+    body{
+        /*
+        TODO-later: blog about setting body: height:100% to make this work
+    http://stackoverflow.com/questions/1575141/make-div-100-height-of-browser-window
+        */
+    
+        height:100%;
+        padding-bottom:0px;
+    }     
+    html, #gameContainer, .gameInProgress, #boardContainer, #selectTiles, .selectTileContainer{
+        height:100%;
+    }
+
+    /*This is 85 because the navbar is there and the body has padding-top:50px*/
+    .body-content
+    {
+        height: 88%;
+    }
+
+    .myTileContainer
+    {
+        background:none;
+        padding:5px;
+    }
+
+    #gameCodeShown
+    {
+        position:absolute;
+        left:10px;
+        bottom:5px;
+        z-index:99999;
+    }
+
+
+    /** different tiles need different sizes */
+    .myTileContainer > .tile
+    {
+        width:20%;
+        height:40%;
+        margin-right:10px;
+        margin-bottom:15px;
+    }
+
+    #selectTiles > .tile, .myTileContainer > .tile 
+    {
+        width:30px;
+        height:60px;
+        margin-bottom:15px;
+        margin-right:15px;
+    }
+
+    .tileHalf{
+        height:50%;
+        background-size:100%;
+        width:100%;
+    }
 }
