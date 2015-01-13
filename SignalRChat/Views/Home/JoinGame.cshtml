@@ -1,5 +1,6 @@
 ﻿@model DominoesWithCompadres.Models.ViewModel.JoinGame
 
+@Html.ValidationSummary()
 @using (Html.BeginForm("Join", "Game", FormMethod.Post))
 {
     @Html.LabelFor(model => model.GameCode)

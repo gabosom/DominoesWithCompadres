@@ -91,8 +91,6 @@ namespace DominoesWithCompadres.Controllers
                 {
                     //TODO 10: if model is incomplete, then redirect with error
 
-                    //TODO 11: make sure the gamecode is always caps
-
                     ViewBag.DisplayName = GameStartDetails.UserDisplayName;
                     ViewBag.UserType = GameStartDetails.UserType.ToString();
 
@@ -104,8 +102,11 @@ namespace DominoesWithCompadres.Controllers
                     }
                     else
                     {
-                        //TODO 12
-                        throw new Exception("Game doesn't exist");
+                        ModelState.AddModelError("GameCode", "The game doesn't exist");
+                        return View("../Home/Index", new JoinOrCreateGameModel()
+                        {
+                            joinGame = GameStartDetails
+                        });
                     }
                     
                 }
