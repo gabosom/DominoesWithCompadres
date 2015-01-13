@@ -36,6 +36,12 @@
             <span>GameCode</span> <input type="text" name="gameCode" />
                 <br/>
             <span>DisplayName</span> <input type="text" name="userDisplayName" />
+            
+            foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
+                @Html.Label(value)
+                @Html.RadioButtonFor(model => model.UserType, value)
+            }
+            
             <input type="submit" value="Create" />
         }
     </div>

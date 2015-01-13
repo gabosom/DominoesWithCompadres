@@ -46,6 +46,7 @@ namespace DominoesWithCompadres.Controllers
                 //TODO 11: make sure the gamecode is always caps
 
                 ViewBag.DisplayName = GameStartDetails.UserDisplayName;
+                ViewBag.UserType = GameStartDetails.UserType.ToString();
 
                 if(GameStartDetails.UserAction.Equals("newGame"))
                 { 

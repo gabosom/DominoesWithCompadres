@@ -2,6 +2,8 @@
     //**** Knockout Data ***///
 
     var gameCode = $("#gameCode").val();
+    var userType = $("#userType").val();
+    var displayName = $("#displayName").val();
     var userInTurn = false;
     var tilesInRound = new Array();
     var tilesInRoundClient = 0;
@@ -237,7 +239,7 @@
     $.connection.hub.start().done(function () {
 
         //make user join game
-        gameHub.server.joinGame($("#displayName").val(), $("#gameCode").val());
+        gameHub.server.joinGame(displayName, gameCode, userType);
     });
 
 

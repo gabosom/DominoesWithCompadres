@@ -268,6 +268,11 @@ namespace DominoesWithCompadres.Models
             else
                 this.PlayerNextTurn();
         }
+
+        internal void AddViewer(Viewer newViewer)
+        {
+            this.Viewers.Add(newViewer);
+        }
     }
 
     public enum GameState

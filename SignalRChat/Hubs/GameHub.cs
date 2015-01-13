@@ -6,32 +6,52 @@ using Microsoft.AspNet.SignalR;
 using DominoesWithCompadres.Utils;
 using DominoesWithCompadres.Models;
 using System.Threading;
+using DominoesWithCompadres.Models.ViewModel;
 
 namespace DominoesWithCompadres.Hubs
 {
     public class GameHub : Hub
     {
-        public void JoinGame(string displayName, string gameCode)
+        public void JoinGame(string displayName, string gameCode, UserType userType)
         {
             //add user to Game
             DominoGame game = GameService.Get(gameCode);
-            Player newPlayer = new Player()
+            
+            switch(userType)
             {
-                ConnectionID = Context.ConnectionId,
-                DisplayName = displayName,
-                ID = GameService.GeneratePlayerId()
-            };
+                case UserType.Player:
+                    {
+                        Player newPlayer = new Player()
+                        {
+                            ConnectionID = Context.ConnectionId,
+                            DisplayName = displayName,
+                            ID = GameService.GeneratePlayerId()
+                        };
+                        game.AddPlayer(newPlayer);
+                        Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                    }break;
 
-            game.AddPlayer(newPlayer);
+                case UserType.Viewer:
+                    {
+                        Viewer newViewer = new Viewer()
+                        {
+                            ConnectionID = Context.ConnectionId,
+                            ID = GameService.GeneratePlayerId()
+                        };
+                        game.AddViewer(newViewer);
+                    }break;
+            }
+            
+            
+
+            
 
             //add user to SignalR group
             Groups.Add(Context.ConnectionId, gameCode);
 
             Thread.Sleep(500);
-            Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
-            Clients.Caller.setupGame(game);
 
-            
+            Clients.Caller.setupGame(game);            
         }
     
         public void UserReady(string gameCode)
