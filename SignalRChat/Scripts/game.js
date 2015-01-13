@@ -39,6 +39,8 @@
         self.mySelectedTile = ko.observable();
         self.firstPlayedTile = ko.observable();
         self.message = ko.observable();
+        self.isUserSmallScreen = ko.observable();
+        self.screenOrientation = ko.observable();
         
 
         this.initializeViewModel = function (game) {
@@ -264,7 +266,8 @@
         viewModel.setPlayerInTurn(playerPosition);
 
         WriteConsole("Update Player In Turn: " + playerPosition);
-        if(isUsersTurn())
+
+        if (isUsersTurn())
         {
             WriteConsole("It's MY turn");
             //need to generate possible options for plays
@@ -823,7 +826,7 @@
 
     function setupPlayer()
     {
-        /// <summary>Sets up actions for the user based on it being a player or not</summary>
+        /// <summary>Sets up actions & metadata for the user based on it being a player or not</summary>
         if(!isUserPlayer())
         {
             $("#btnRoundReady").hide();
@@ -832,6 +835,31 @@
         {
             $("#btnRoundReady").show();
         }
+
+        //determine screensize & orientation
+        var screenWidth = $(document).width();
+        var screenHeight = $(document).height();
+
+        //landscape
+        if(screenWidth > screenHeight)
+        {
+            viewModel.screenOrientation("landscape");
+        }
+        else
+        {
+            viewModel.screenOrientation("portrait");
+        }
+
+        if(screenWidth <= 768)
+        {
+            viewModel.isUserSmallScreen(true);
+        }
+        else
+        {
+            viewModel.isUserSmallScreen(false);
+        }
+
+        alert(screenWidth + " " + viewModel.isUserSmallScreen()); 
     }
 
 

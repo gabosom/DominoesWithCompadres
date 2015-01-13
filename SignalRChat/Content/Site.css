@@ -81,6 +81,7 @@ input[type="checkbox"].input-validation-error {
     visibility:visible;
     display:block;
     height:600px;
+    width:800px;
     position:absolute;
     top:0px;
     left:0px;
@@ -89,8 +90,8 @@ input[type="checkbox"].input-validation-error {
 .selectReadyContainer > .overlay
 {
     background-color: rgba(3, 3, 3, 0.81);
-    width:800px;
-    height: 600px;
+    width:100%;
+    height: 100%;
 }
 
 .selectReadyContainer > .overlay > .overlayContent
@@ -256,42 +257,60 @@ input[type="checkbox"].input-validation-error {
 
 /***** Mobile CSS *******/
 @media (min-width: 479px) and (max-width: 767px) {
+    .hideIfMobile
+    {
+        display:none;
+    }
+    
     .roundTileBoard{
         display:none;
         clear:both;
     }
 
-    
-    .myTileAndMoveArea
+
+    /* Layout for mobile divs select */
+    .selectReadyContainer, .selectReadyContainer > .overlay
     {
-        width:50%;
+        width:100%;
         height:100%;
-        float:left;
     }
 
+        .selectReadyContainer > .overlay > .overlayContent 
+        {
+            height:50%;
+        }
 
-    /* Layout for mobile divs*/
-
-    .gameInProgress > .myTileAndMoveArea, .gameInProgress > .mobile_playabbleContainer
-    {
-        float:left;
-    }
+    /* Layout for mobile divs in game*/
 
     .mobile_playabbleContainer
     {
-        width: 50%;
-        height:100%;
+        width: 100%;
+        height:50%;
     }
         .mobile_playabbleArea
         {
-            float:left;
             height:50%;
-            width:100%;
             display:block;
-            border:1px solid black;
-        
+            width:30%;
+        }
+
+        .mobile_playLast
+        {
+            float:left;
+            border:1px solid black;        
+        }
+
+        .mobile_playFirst
+        {
+            float:right;
+            border:1px solid blue;        
         }
         
+    .myTileAndMoveArea
+    {
+        width:100%;
+        height:50%;
+    }
     footer{
         clear:both;
         display:none;
