@@ -100,7 +100,7 @@ namespace DominoesWithCompadres.Controllers
                     DominoGame existingGame = GameService.Get(GameStartDetails.GameCode);
                     if(existingGame != null)
                     {
-                        return View(existingGame);
+                        return View("Start", existingGame);
                     }
                     else
                     {
