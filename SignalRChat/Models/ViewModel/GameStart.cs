@@ -53,7 +53,7 @@ namespace DominoesWithCompadres.Models.ViewModel
     {
         [Required]
         [StringLength(15, MinimumLength = 1)]
-        public string UserDisplayName { get; set; }
+        public string Create_UserDisplayName { get; set; }
         [Required]
         public UserType UserType { get; set; }
     }
@@ -69,4 +69,5 @@ namespace DominoesWithCompadres.Models.ViewModel
         Viewer,
         Player
     }
+
 }

@@ -1,6 +1,10 @@
 ﻿@model DominoesWithCompadres.Models.ViewModel.JoinGame
 
-@Html.ValidationSummary()
+@if (!String.IsNullOrEmpty(ViewBag.ActionName) && (string)ViewBag.ActionName == "Join")
+{
+    @Html.ValidationSummary()
+}
+
 @using (Html.BeginForm("Join", "Game", FormMethod.Post))
 {
     @Html.LabelFor(model => model.GameCode)

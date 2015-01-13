@@ -46,27 +46,13 @@ namespace DominoesWithCompadres.Controllers
                 {
                     //TODO 10: if model is incomplete, then redirect with error
 
-                    //TODO 11: make sure the gamecode is always caps
-
-                    ViewBag.DisplayName = GameStartDetails.UserDisplayName;
+                    ViewBag.DisplayName = GameStartDetails.Create_UserDisplayName;
                     ViewBag.UserType = GameStartDetails.UserType.ToString();
 
                      
                         DominoGame newGame = GameService.CreateGame();
                         return View(newGame);
                     
-                    /* Save this for the join
-                        DominoGame existingGame = GameService.Get(GameStartDetails.GameCode);
-                        if(existingGame != null)
-                        {
-                            return View(existingGame);
-                        }
-                        else
-                        {
-                            //TODO 12
-                            throw new Exception("Game doesn't exist");
-                        }
-                    }*/
                 }
                 catch
                 {
@@ -75,6 +61,7 @@ namespace DominoesWithCompadres.Controllers
             }
             else
             {
+                ViewBag.ActionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 return View("../Home/Index", new JoinOrCreateGameModel()
                 {
                     createGame = GameStartDetails
@@ -102,6 +89,7 @@ namespace DominoesWithCompadres.Controllers
                     }
                     else
                     {
+                        ViewBag.ActionName = this.ControllerContext.RouteData.Values["action"].ToString();
                         ModelState.AddModelError("GameCode", "The game doesn't exist");
                         return View("../Home/Index", new JoinOrCreateGameModel()
                         {
@@ -117,6 +105,7 @@ namespace DominoesWithCompadres.Controllers
             }
             else
             {
+                ViewBag.ActionName = this.ControllerContext.RouteData.Values["action"].ToString();
                 return View("../Home/Index", new JoinOrCreateGameModel()
                 {
                     joinGame = GameStartDetails

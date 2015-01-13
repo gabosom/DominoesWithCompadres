@@ -1,9 +1,14 @@
 ﻿@model DominoesWithCompadres.Models.ViewModel.CreateGame
 
+@if (!String.IsNullOrEmpty(ViewBag.ActionName) && ViewBag.ActionName == "Start")
+{
+    @Html.ValidationSummary()
+}
+
 @using (Html.BeginForm("Start", "Game", FormMethod.Post))
 {
-    @Html.TextBoxFor(model => model.UserDisplayName, new{id = "create_displayName"})
-    @Html.ValidationMessageFor(model => model.UserDisplayName, "*");
+    @Html.TextBoxFor(model => model.Create_UserDisplayName, new{id = "create_displayName", Name= "create_displayName"})
+    @Html.ValidationMessageFor(model => model.Create_UserDisplayName, "*");
     <br />
 
     bool first = true;
@@ -12,7 +17,7 @@
         @Html.Label(value)
         if (first)
         {
-        @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
+            @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
             first = false;
         }
         else
