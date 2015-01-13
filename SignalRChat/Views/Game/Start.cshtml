@@ -19,7 +19,7 @@
             <div id="selectTiles" data-bind="foreach: availableTiles">
                 <div class="tile" data-bind="attr: {'data-tileId' : id}">
                     @{
-                        if(Convert.ToBoolean(System.Configuration.ConfigurationManager.AppSettings["DebugDominoes"]))
+                        if(DominoesWithCompadres.Utils.SiteSettings.DebugDominoes)
                         {
                             <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                             <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
