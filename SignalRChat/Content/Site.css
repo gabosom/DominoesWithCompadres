@@ -3,6 +3,8 @@
     padding-bottom: 20px;
 }
 
+
+
 /* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -241,4 +243,115 @@ input[type="checkbox"].input-validation-error {
 
 .btnPassTurn{
     visibility:hidden;
+}
+
+
+
+/*** Hide mobile stuff ***/
+.mobile_playabbleArea
+{
+    display:none;
+}
+
+
+/***** Mobile CSS *******/
+@media (min-width: 479px) and (max-width: 767px) {
+    .roundTileBoard{
+        display:none;
+        clear:both;
+    }
+
+    
+    .myTileAndMoveArea
+    {
+        width:50%;
+        height:100%;
+        float:left;
+    }
+
+
+    /* Layout for mobile divs*/
+
+    .gameInProgress > .myTileAndMoveArea, .gameInProgress > .mobile_playabbleContainer
+    {
+        float:left;
+    }
+
+    .mobile_playabbleContainer
+    {
+        width: 50%;
+        height:100%;
+    }
+        .mobile_playabbleArea
+        {
+            float:left;
+            height:50%;
+            width:100%;
+            display:block;
+            border:1px solid black;
+        
+        }
+        
+    footer{
+        clear:both;
+        display:none;
+    }
+
+
+    body{
+        /*
+        TODO-later: blog about setting body: height:100% to make this work
+    http://stackoverflow.com/questions/1575141/make-div-100-height-of-browser-window
+        */
+    
+        height:100%;
+        padding-bottom:0px;
+    }     
+    html, #gameContainer, .gameInProgress, #boardContainer, #selectTiles, .selectTileContainer{
+        height:100%;
+    }
+
+    /*This is 85 because the navbar is there and the body has padding-top:50px*/
+    .body-content
+    {
+        height: 88%;
+    }
+
+    .myTileContainer
+    {
+        background:none;
+        padding:5px;
+    }
+
+    #gameCodeShown
+    {
+        position:absolute;
+        left:10px;
+        bottom:5px;
+        z-index:99999;
+    }
+
+
+    /** different tiles need different sizes */
+    .myTileContainer > .tile
+    {
+        width:20%;
+        height:40%;
+        margin-right:10px;
+        margin-bottom:15px;
+    }
+
+    #selectTiles > .tile, .myTileContainer > .tile 
+    {
+        width:30px;
+        height:60px;
+        margin-bottom:15px;
+        margin-right:15px;
+    }
+
+    .tileHalf{
+        height:50%;
+        background-size:100%;
+        width:100%;
+    }
 }

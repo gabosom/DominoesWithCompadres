@@ -7,7 +7,7 @@
         </div>
     </div>
 
-    <div>GameCode: <span data-bind="text: gameCode"></span></div>
+    <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
 
     <input type="hidden" id="gameCode" value="@Model.GameCode" />
     <input type="hidden" id="userType" value="@ViewBag.UserType" />
@@ -31,6 +31,8 @@
         </div>
         
         <div class="state gameInProgress">
+
+            
             <div class="myTileAndMoveArea">
                 <div class="myTileContainer" data-bind="foreach: myRoundTiles">
                     <div class="tile" data-bind="attr: {'data-tileId' : id}, click: $parent.selectMyTile, css: $parent.getTilesDropClasses($data)">
@@ -40,7 +42,11 @@
                 </div>
                 <input type="button" value="pass" class="btnPassTurn" />
             </div>
-
+            <div class="mobile_playabbleContainer">
+                <div class="mobile_playabbleArea playLast"></div>
+                <div class="mobile_playabbleArea playFirst"></div>
+            </div>
+            
 
             <div class="roundTileBoard" data-bind="foreach: playedTiles">
                 <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
