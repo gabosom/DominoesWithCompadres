@@ -135,9 +135,9 @@ namespace DominoesWithCompadres.Models
             currentPlayer.IsReady = true;
         }
 
-        private Player GetPlayer(string ConnectionId)
+        public Player GetPlayer(string ConnectionId)
         {
-            return this.Players.Single<Player>(p => p.ConnectionID.Equals(ConnectionId));
+            return this.Players.SingleOrDefault<Player>(p => p.ConnectionID.Equals(ConnectionId));
         }
 
         private Player GetActivePlayer()

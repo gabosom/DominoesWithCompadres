@@ -128,5 +128,20 @@ namespace DominoesWithCompadres.Utils
             results.Message = messageBuilder.ToString();
             return results;
         }
+
+        public static List<string> GetViewersConnectionIds(string gameCode)
+        {
+
+            //TODO: try/catch
+            DominoGame game = GameService.Get(gameCode);
+            List<string> connections = new List<string>();
+
+            foreach(Viewer viewer in game.Viewers)
+            {
+                connections.Add(viewer.ConnectionID);
+            }
+
+            return connections;
+        }
     }
 }

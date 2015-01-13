@@ -73,25 +73,33 @@ namespace DominoesWithCompadres.Hubs
     
         public void SelectedTile(string gameCode, int tileId)
         {
+
             //TODO 15: try/catch
             DominoGame game = GameService.Get(gameCode);
 
-            bool selectedTile = game.SelectTile(Context.ConnectionId, tileId);
+            //TODO: this player logic should go in the GameService
+            Player p = game.GetPlayer(Context.ConnectionId);
 
-            //if user took tile successfully
-            if (selectedTile)
+            if(p != null)
             {
-                Clients.OthersInGroup(gameCode).otherUserTookTile(tileId);
-            }
+                bool selectedTile = game.SelectTile(Context.ConnectionId, tileId);
 
-            //always notify caller of what happened
-            Clients.Caller.ITookTile(tileId, selectedTile);
+                //if user took tile successfully
+                if (selectedTile)
+                {
+                    Clients.OthersInGroup(gameCode).otherUserTookTile(tileId);
+                }
+
+                //always notify caller of what happened
+                //TODO: shouldn't send this if the caller is not a player
+                Clients.Caller.ITookTile(tileId, selectedTile);
             
-            if(game.ReadyForRoundStart())
-            {
-                game.StartRound();
-                Clients.Group(gameCode).updateGameState(game.State.ToString());
-                Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                if(game.ReadyForRoundStart())
+                {
+                    game.StartRound();
+                    Clients.Group(gameCode).updateGameState(game.State.ToString());
+                    Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                }
             }
         }
 
@@ -101,42 +109,47 @@ namespace DominoesWithCompadres.Hubs
             //TODO 16: try/catch
             DominoGame game = GameService.Get(gameCode);
 
-            if(tilePlayed != null)
-            {
-                
-                bool playIsGood = game.PlayedTile(Context.ConnectionId, tilePlayed, listPosition);
+            //TODO: this player logic should go in the GameService
+            Player p = game.GetPlayer(Context.ConnectionId);
 
-                if(playIsGood)
+            if(p != null)
+            { 
+                if(tilePlayed != null)
                 {
-                    Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
+                
+                    bool playIsGood = game.PlayedTile(Context.ConnectionId, tilePlayed, listPosition);
+
+                    if(playIsGood)
+                    {
+                        Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
+                    }
+                    else
+                    {
+                        //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
+                    }
                 }
                 else
                 {
-                    //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
+                    game.PlayerPassTurn(Context.ConnectionId);
+
+                    //TODO 21: send message to clients to show something like a pass message
+                    //TODO 22: Round over when all players pass
+                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                }
+
+
+                //check what the game state is
+                switch(game.State)
+                {
+                    case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
+                    case GameState.RoundFinished:
+                        {
+                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
+                            Clients.Group(gameCode).updateGameState(game.State.ToString());
+                        } break;
+                    case GameState.Finished: break;
                 }
             }
-            else
-            {
-                game.PlayerPassTurn(Context.ConnectionId);
-
-                //TODO 21: send message to clients to show something like a pass message
-                //TODO 22: Round over when all players pass
-                Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
-            }
-
-
-            //check what the game state is
-            switch(game.State)
-            {
-                case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
-                case GameState.RoundFinished:
-                    {
-                        Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
-                        Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    } break;
-                case GameState.Finished: break;
-            }
-            
         }
     }
 }

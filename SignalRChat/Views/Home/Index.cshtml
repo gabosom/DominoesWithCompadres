@@ -16,15 +16,13 @@
         {
             <input type="hidden" name="userAction" value="newGame" />
             <input type="text" name="userDisplayName" />
-            
+            <br />
             foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
                 @Html.Label(value)
                 @Html.RadioButtonFor(model => model.UserType, value)
             }
-            
-            
+            <br />
             <input type="submit" value="Create" />
-            
         }
         
     </div>
@@ -36,12 +34,12 @@
             <span>GameCode</span> <input type="text" name="gameCode" />
                 <br/>
             <span>DisplayName</span> <input type="text" name="userDisplayName" />
-            
+            <br />
             foreach(string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType))){
                 @Html.Label(value)
                 @Html.RadioButtonFor(model => model.UserType, value)
             }
-            
+            <br />
             <input type="submit" value="Create" />
         }
     </div>

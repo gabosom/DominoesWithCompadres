@@ -76,7 +76,8 @@
             for (i = 0; i < tiles.length; i++)
                 self.availableTiles.push(tiles[i]);
 
-            setSelectableTiles();
+            if(isUserPlayer())
+                setSelectableTiles();
         };
 
         this.updateGameState = function (state) {
@@ -104,19 +105,21 @@
         };
 
         self.selectMyTile = function (selectedTile, event) {
-
-            if (userInTurn)
+            if(isUserPlayer())
             {
-                $(".myTileContainer > .tile").removeClass("selected");
+                if (userInTurn)
+                {
+                    $(".myTileContainer > .tile").removeClass("selected");
                 
-                self.mySelectedTile(selectedTile);
+                    self.mySelectedTile(selectedTile);
 
-                //TODO 2: if user clicks a selected tile, it should unselect and hide possible plays
-                $(".myTileContainer > div[data-tileid='" + selectedTile.id+ "']").addClass("selected");
+                    //TODO 2: if user clicks a selected tile, it should unselect and hide possible plays
+                    $(".myTileContainer > div[data-tileid='" + selectedTile.id+ "']").addClass("selected");
 
 
-                //show where the selected tile can be placed                
-                showPossibleTilePlays(selectedTile);
+                    //show where the selected tile can be placed                
+                    showPossibleTilePlays(selectedTile);
+                }
             }
         };
 
@@ -703,6 +706,9 @@
 
     function getDropClassForValue(value)
     {
+        /// <summary>Generates class that represents the droppable number it can receive</summary>
+        /// <param name="value" type="int">the tile value</param>
+        /// <returns type="string">Droppable class</returns>
         var classToAdd = "";
         switch (value) {
             case "0": case 0:
@@ -722,8 +728,17 @@
         }
         return classToAdd;
     }
-
     
+
+    function isUserPlayer()
+    {
+        /// <summary>Determines if the current user is a player or not</summary>
+        /// <returns type="bool">Bool reflecting if user is player or not</returns>
+        switch (userType) {
+            case "Player": return true;
+            case "Viewer": return false;
+        }
+    }
 
     ///selecting a tile when shuffle
     ///need to check with server if no one else has selected that one
@@ -806,8 +821,21 @@
     });
 
 
+    function setupPlayer()
+    {
+        /// <summary>Sets up actions for the user based on it being a player or not</summary>
+        if(!isUserPlayer())
+        {
+            $("#btnRoundReady").hide();
+        }
+        else
+        {
+            $("#btnRoundReady").show();
+        }
+    }
 
-    /****** LAYOUT ******/
+
+    /****** LAYOUT  & Game Setup ******/
     $(".selectReadyContainer > .overlay > .overlayContent").position({
         of: $(".selectReadyContainer > .overlay"),
         my: "center",
@@ -818,6 +846,8 @@
 
     viewModel.setMessage("Game will begin when all players are ready...");
 
+    setupPlayer();
+    
 
 
     /***** DEBUG FUNCTIONS *****/
