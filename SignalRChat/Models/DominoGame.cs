@@ -272,17 +272,24 @@ namespace DominoesWithCompadres.Models
 
         internal void PlayerPassTurn(string p)
         {
-            this.CurrentRound.PlayersThatPassed.Add(p);
+            if(this.Players[this.CurrentRound.PlayerInTurn].ConnectionID.Equals(p))
+            {   
+                this.CurrentRound.PlayersThatPassed.Add(p);
             
-            //if everone has passed, then end game
-            if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
-            {
-                //TODO 25: need to make this a new state and add a correct message
-                this.State = GameState.RoundFinished;
-                InitializeRound();
+                //if everone has passed, then end game
+                if (this.CurrentRound.PlayersThatPassed.Count == this.Players.Count)
+                {
+                    //TODO 25: need to make this a new state and add a correct message
+                    this.State = GameState.RoundFinished;
+                    InitializeRound();
+                }
+                else
+                    this.PlayerNextTurn();
             }
             else
-                this.PlayerNextTurn();
+            {
+                //TODO: trying to pass when it's not turn
+            }
         }
 
         internal void AddViewer(Viewer newViewer)
