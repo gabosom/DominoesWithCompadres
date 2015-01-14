@@ -218,6 +218,8 @@ namespace DominoesWithCompadres.Models
             //TODO 23: null expception
             //get tile to be played
             Tile tilePlayed = curPlayer.Tiles.Single(t => t.ID == tile.ID);
+            tilePlayed.Value1 = tile.Value1;
+            tilePlayed.Value2 = tile.Value2;
 
             //TODO 24: make sure that the value we get from the client is updated here, the client can rotate the tiles if needed
 
