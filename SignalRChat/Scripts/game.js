@@ -110,6 +110,10 @@
 
             //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles.removeAll();
+
+            //set correct # of available tiles, this helps with the logic to show steal or pass button
+            for (i = 0; i < self.availableTiles().length; i++)
+                self.availableTiles.pop();
         };
 
         self.selectMyTile = function (selectedTile, event) {
@@ -943,7 +947,6 @@
         tilesInRoundClient = 0;
 
         $("#takeTile").show();
-        $(".btnPassTurn").hide();
     }
 
     //this is sending the tile object {id, value1, value2}
@@ -978,9 +981,6 @@
                 {
                     $(".state").hide();
                     $(".gameInProgress").show();
-
-                    //TODO 37: will need to refactor this once I have a table/viewer mode only
-                    initializeRound();
                 } break;
         }
 
