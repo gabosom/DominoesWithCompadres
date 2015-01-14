@@ -266,6 +266,10 @@ input[type="checkbox"].input-validation-error {
 }
 
 
+/*** Hide really small resolution ***/
+#resolutionTooSmall{
+    display:none;
+}
 
 /*** Hide mobile stuff ***/
 .mobile_playabbleArea
@@ -281,6 +285,17 @@ input[type="checkbox"].input-validation-error {
 .playerList.right{
     float:right;
 }
+
+@media (max-width: 478px){
+    #resolutionTooSmall{
+        display:block;
+    }
+
+    #gameContainer{
+        display:none;
+    }
+}
+
 
 /***** Mobile CSS *******/
 @media (min-width: 479px) and (max-width: 767px) {

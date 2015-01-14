@@ -676,12 +676,17 @@
                     //turns up, right, down, right
                     if(listPosition == "first")
                     {
+                        if (list_firstDirectionIndex == 2)
+                            invertTileValueDivs(selector)
                         list_firstDirectionIndex = ++list_firstDirectionIndex%4;
                     }
 
                         //turns down left up left
                     else
                     {
+                        if (list_lastDirectionIndex == 2)
+                            invertTileValueDivs(selector)
+
                         list_lastDirectionIndex = ++list_lastDirectionIndex % 4;
                     }
                 }
@@ -1011,6 +1016,34 @@
         }
     });
 
+    //bind window change events
+    $(window).bind("resize", function (e) {
+        updateUserScreenData();
+
+        //TODO 55: redraw tiles as needed when passing from one layout to the other
+    })
+
+    function updateUserScreenData()
+    {
+        //determine screensize & orientation
+        var screenWidth = $(document).width();
+        var screenHeight = $(document).height();
+
+        //landscape
+        if (screenWidth > screenHeight) {
+            viewModel.screenOrientation("landscape");
+        }
+        else {
+            viewModel.screenOrientation("portrait");
+        }
+
+        if (screenWidth <= 768) {
+            viewModel.isUserSmallScreen(true);
+        }
+        else {
+            viewModel.isUserSmallScreen(false);
+        }
+    }
 
     function setupPlayer()
     {
@@ -1024,28 +1057,7 @@
             $("#btnRoundReady").show();
         }
 
-        //determine screensize & orientation
-        var screenWidth = $(document).width();
-        var screenHeight = $(document).height();
-
-        //landscape
-        if(screenWidth > screenHeight)
-        {
-            viewModel.screenOrientation("landscape");
-        }
-        else
-        {
-            viewModel.screenOrientation("portrait");
-        }
-
-        if(screenWidth <= 768)
-        {
-            viewModel.isUserSmallScreen(true);
-        }
-        else
-        {
-            viewModel.isUserSmallScreen(false);
-        }
+        updateUserScreenData();
     }
 
 

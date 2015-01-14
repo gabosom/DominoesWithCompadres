@@ -12,6 +12,7 @@ namespace DominoesWithCompadres.Models.ViewModel
         public List<Player> Winners { get; set; }
         [JsonProperty("message")]
         public string Message { get; set; }
+        public int PointsWon { get; set; }
 
         public RoundResults()
         {

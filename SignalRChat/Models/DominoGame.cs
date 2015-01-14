@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using DominoesWithCompadres.Models.ViewModel;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 
 namespace DominoesWithCompadres.Models
@@ -19,6 +21,8 @@ namespace DominoesWithCompadres.Models
         public List<Tile> AvailableTiles { get; set; }
         [JsonProperty("currentRound")]
         public Round CurrentRound { get; set; }
+        public int GameLimit { get; set; }
+        
         private Random _RandomNumberGenerator { get; set; }
         
         private bool ReadyForRound { get; set; }
@@ -33,7 +37,7 @@ namespace DominoesWithCompadres.Models
             this.ReadyForRound = false;
             this._IDsforTiles = new List<int>();
             this._RandomNumberGenerator = new Random((int)DateTime.Now.Ticks);
-            
+            this.GameLimit = 50;
             
             this.GenerateTiles();
         }
@@ -258,11 +262,66 @@ namespace DominoesWithCompadres.Models
             }
             else
             {
+                this.RoundFinished(curPlayer);
                 //TODO 25: game finished, not just round
-                this.State = GameState.RoundFinished;
+                //this.State = GameState.RoundFinished;
             }
 
             return true;
+        }
+
+        private void RoundFinished(Player winner)
+        {
+            this.CurrentRound.Results = new RoundResults();
+
+            StringBuilder messageBuilder = new StringBuilder();
+
+            //Make this more efficient
+            //get player with 0 tiles
+            messageBuilder.Append(winner.DisplayName);
+
+
+            this.CurrentRound.Results.Winners.Add(winner);
+            //if it's a team game, then add team mate
+            if (this.Players.Count == 4)
+            {
+                Player otherWinner = this.Players[(this.Players.IndexOf(winner) + 2) % 4];
+                this.CurrentRound.Results.Winners.Add(otherWinner);
+                messageBuilder.Append(" & ").Append(otherWinner.DisplayName);
+                this.CurrentRound.Results.Winners.Add(otherWinner);
+            }
+
+
+            //calculate winning points
+            List<Player> losers = this.Players.Where<Player>(p => !this.CurrentRound.Results.Winners.Contains(p)).ToList<Player>();
+            int totalPoints = 0;
+
+            foreach (Player p in losers)
+            {
+                foreach (Tile t in p.Tiles)
+                {
+                    totalPoints += t.Value1;
+                    totalPoints += t.Value2;
+                }
+            }
+            
+            foreach(Player p in this.CurrentRound.Results.Winners)
+            {
+                p.Points += totalPoints;
+            }
+
+            if((winner.Points + totalPoints) >= this.GameLimit)
+            {
+                this.State = GameState.Finished;
+                messageBuilder.Append(" won the whole game with " + totalPoints + " points.");
+            }
+            else
+            {
+                this.State = GameState.RoundFinished;
+                messageBuilder.Append(" won round with " + totalPoints + " points.");
+            }
+            this.CurrentRound.Results.Message = messageBuilder.ToString();
+            
         }
 
         private void PlayerNextTurn()
