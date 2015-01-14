@@ -27,6 +27,12 @@ namespace DominoesWithCompadres
             bundles.Add(new StyleBundle("~/Content/gamecss").Include(
                         "~/Content/site.css"
                 ));
+
+            bundles.Add(new ScriptBundle("~/bundles/gamescript").Include(
+                "~/Scripts/game/globalvars.js",
+                "~/Scripts/game/viewmodel.js",
+                "~/Scripts/game/comms.js",
+                "~/Scripts/game/gamelogic.js"));
         }
     }
 }

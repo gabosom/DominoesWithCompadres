@@ -980,6 +980,7 @@
 
             case "SelectingTiles":
                 {
+                    $(".readyInfoShown").addClass("readyInfoHidden").removeClass("readyInfoShown")
                     $(".state").hide();
                     $(".selectTileContainer").show();
                     cleanUpBoard();
