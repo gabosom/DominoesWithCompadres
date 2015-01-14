@@ -113,6 +113,24 @@ input[type="checkbox"].input-validation-error {
 
 
 /**** Users selecting tiles ****/
+
+.takeDisabled{
+    color:#808080;
+}
+
+.takeEnabled{
+    color:red;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.passDisabled{
+
+}
+.passEnabled{
+
+}
+
 #selectTiles > .tile, .myTileContainer > .tile {
     float:left;
     margin-right:20px;

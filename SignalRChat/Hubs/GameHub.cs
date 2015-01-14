@@ -71,6 +71,11 @@ namespace DominoesWithCompadres.Hubs
 
         }
     
+        public void TakeTile(string gameCode)
+        {
+            GameService.UserTakesTile(Context.ConnectionId, gameCode, this);
+        }
+
         public void SelectedTile(string gameCode, int tileId)
         {
 

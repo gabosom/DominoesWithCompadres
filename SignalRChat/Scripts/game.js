@@ -92,6 +92,10 @@
             this.myRoundTiles.push(this.getTile(tileId));
         };
 
+        this.addRoundTileWithTile = function (tile) {
+            this.myRoundTiles.push(tile);
+        };
+
         this.getTile = function (tileId) {
             for(i = 0; i < this.availableTiles().length; i++)
             {
@@ -201,6 +205,15 @@
 
     gameHub.client.updateGameState = function (state) {
         changeGameState(state);
+    };
+
+    gameHub.client.addTakenTile = function (tile, playerId) {
+        //TODO: make animation for taken tile
+
+        if (gameHub.connection.id == playerId)
+            viewModel.addRoundTileWithTile(tile);
+        
+        viewModel.availableTiles.pop();
     };
 
     gameHub.client.otherUserTookTile = function (tileId) {
@@ -318,7 +331,17 @@
 
                 if(!canMakeMove)
                 {
-                    $(".btnPassTurn").css("visibility", "visible");
+                    if (viewModel.availableTiles().length > 0)
+                    {
+                        $("#takeTile").addClass("takeEnabled");
+                        $(".btnPassTurn").hide();
+                    }
+                    else
+                    {
+                        $("#takeTile").hide();
+                        $(".btnPassTurn").css("visibility", "visible");
+                        $(".btnPassTurn").addClass("passEnabled");
+                    }
                 }
 
             }
@@ -918,6 +941,9 @@
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
         tilesInRoundClient = 0;
+
+        $("#takeTile").show();
+        $(".btnPassTurn").hide();
     }
 
     //this is sending the tile object {id, value1, value2}
@@ -967,6 +993,12 @@
         //TODO 38: only do this when in turn
 
         gameHub.server.userPlayedTile(gameCode, null, null)
+        $(this).removeClass("passEnabled");
+    });
+
+    $("#takeTile").click(function () {
+        gameHub.server.takeTile(gameCode);
+        $(this).removeClass("takeEnabled");
     });
 
 

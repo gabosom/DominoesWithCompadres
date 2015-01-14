@@ -66,8 +66,8 @@ namespace DominoesWithCompadres.Models.ViewModel
 
     public enum UserType
     {
-        Viewer,
-        Player
+        Player,
+        Viewer        
     }
 
 }

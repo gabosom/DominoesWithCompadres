@@ -19,7 +19,7 @@ namespace DominoesWithCompadres.Models
         public List<Tile> AvailableTiles { get; set; }
         [JsonProperty("currentRound")]
         public Round CurrentRound { get; set; }
-        
+        private Random _RandomNumberGenerator { get; set; }
         
         private bool ReadyForRound { get; set; }
 
@@ -32,6 +32,7 @@ namespace DominoesWithCompadres.Models
             this.State = GameState.Created;
             this.ReadyForRound = false;
             this.GenerateTiles();
+            this._RandomNumberGenerator = new Random((int)DateTime.Now.Ticks);
             //this.InitializeRound();
         }
 
@@ -272,6 +273,18 @@ namespace DominoesWithCompadres.Models
         internal void AddViewer(Viewer newViewer)
         {
             this.Viewers.Add(newViewer);
+        }
+
+        internal Tile UserTakesTile(Player player)
+        {
+            Tile tileToTake = this.GetAvailableTile(this.AvailableTiles[_RandomNumberGenerator.Next(this.AvailableTiles.Count)].ID);
+            
+            if(tileToTake != null)
+            {
+                this.PlayerNextTurn();
+                player.Tiles.Add(tileToTake);
+            }
+            return tileToTake;
         }
     }
 

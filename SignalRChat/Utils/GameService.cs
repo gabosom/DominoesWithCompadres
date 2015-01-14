@@ -143,5 +143,34 @@ namespace DominoesWithCompadres.Utils
 
             return connections;
         }
+
+        internal static void UserTakesTile(string playerConnectionId, string gameCode, Hubs.GameHub gameHub)
+        {
+            //find game and player
+            //TODO: try/catch
+            DominoGame game = GameService.Get(gameCode);
+
+            if(game.Players[game.PlayerInTurn()].ConnectionID.Equals(playerConnectionId))
+            {
+                Tile t = game.UserTakesTile(game.GetPlayer(playerConnectionId));
+
+                if(t != null)
+                {
+                    //alert client of the new tile
+                    gameHub.Clients.Group(gameCode).addTakenTile(t, playerConnectionId);
+
+                    //alert everyone of the new user
+                    gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                }
+                else
+                {
+                    //TODO: there are no tiles left or couldn't get tile
+                }
+            }
+            else
+            {
+                //TODO: user is not in turn, what to do here
+            }
+        }
     }
 }

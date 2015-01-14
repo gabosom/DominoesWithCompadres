@@ -167,6 +167,7 @@
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\GameService.cs" />
     <Compile Include="Utils\IGameService.cs" />
+    <Compile Include="Utils\SiteSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />
