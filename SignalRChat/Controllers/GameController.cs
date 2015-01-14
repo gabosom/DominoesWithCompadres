@@ -84,20 +84,34 @@ namespace DominoesWithCompadres.Controllers
 
 
                     DominoGame existingGame = GameService.Get(GameStartDetails.GameCode);
-                    if(existingGame != null)
+
+                    if(existingGame.Players.Count < 4)
                     {
-                        return View("Start", existingGame);
+                        if(existingGame != null)
+                        {
+                            return View("Start", existingGame);
+                        }
+                        else
+                        {
+                            ViewBag.ActionName = this.ControllerContext.RouteData.Values["action"].ToString();
+                            ModelState.AddModelError("GameCode", "The game doesn't exist");
+                            return View("../Home/Index", new JoinOrCreateGameModel()
+                            {
+                                joinGame = GameStartDetails
+                            });
+                        }
                     }
+
+                    //game has already 4 players
                     else
                     {
                         ViewBag.ActionName = this.ControllerContext.RouteData.Values["action"].ToString();
-                        ModelState.AddModelError("GameCode", "The game doesn't exist");
+                        ModelState.AddModelError("GameCode", "The game already has 4 players. You can join as a viewer.");
                         return View("../Home/Index", new JoinOrCreateGameModel()
                         {
                             joinGame = GameStartDetails
                         });
                     }
-                    
                 }
                 catch
                 {

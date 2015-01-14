@@ -70,6 +70,8 @@ input[type="checkbox"].input-validation-error {
 #boardContainer{
     position:relative;
     height:600px;
+    clear:both;
+    width:100%;
 }
 
 .state{
@@ -81,7 +83,7 @@ input[type="checkbox"].input-validation-error {
     visibility:visible;
     display:block;
     height:600px;
-    width:800px;
+    width:100%;
     position:absolute;
     top:0px;
     left:0px;
@@ -271,6 +273,14 @@ input[type="checkbox"].input-validation-error {
     display:none;
 }
 
+.playerList.left
+{
+    float:left;
+}
+
+.playerList.right{
+    float:right;
+}
 
 /***** Mobile CSS *******/
 @media (min-width: 479px) and (max-width: 767px) {
@@ -299,14 +309,20 @@ input[type="checkbox"].input-validation-error {
 
     /* Layout for mobile divs in game*/
 
-    .mobile_playabbleContainer
+    .gameInfoContainer
     {
         width: 100%;
-        height:50%;
+        height:25%;
     }
+
+    #boardContainer{
+        width:100%;
+        height:75%;
+    }
+
         .mobile_playabbleArea
         {
-            height:50%;
+            height:80%;
             display:block;
             width:30%;
         }
@@ -321,6 +337,11 @@ input[type="checkbox"].input-validation-error {
         {
             float:right;
             border:1px solid blue;        
+        }
+
+        .gameInfo{
+            float:left;
+            width:40%;
         }
         
     .myTileAndMoveArea
@@ -365,7 +386,7 @@ input[type="checkbox"].input-validation-error {
         height:100%;
         padding-bottom:0px;
     }     
-    html, #gameContainer, .gameInProgress, #boardContainer, #selectTiles, .selectTileContainer{
+    html, #gameContainer, .gameInProgress, #selectTiles, .selectTileContainer{
         height:100%;
     }
 

@@ -27,8 +27,12 @@ namespace DominoesWithCompadres.Hubs
                             DisplayName = displayName,
                             ID = GameService.GeneratePlayerId()
                         };
-                        game.AddPlayer(newPlayer);
-                        Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                        if(game.AddPlayer(newPlayer))
+                            Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                        else
+                        { 
+                            //TODO: what do we show when player couldn't join game
+                        }
                     }break;
 
                 case UserType.Viewer:

@@ -99,9 +99,18 @@ namespace DominoesWithCompadres.Models
             return this.CurrentRound.PlayerInTurn;
         }
 
-        public void AddPlayer(Player p)
+        public bool AddPlayer(Player p)
         {
-            this.Players.Add(p);
+            if (this.Players.Count < 4)
+            {
+                this.Players.Add(p);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
         public bool IsEveryoneReady()

@@ -960,6 +960,12 @@
         $(".droppableTileZone[class*='" + getDropClassForValue(tile.value2) + "']").css("visibility", "visible");
     }
 
+    function cleanUpBoard()
+    {
+        viewModel.mobile_firstPlayedTile.removeAll();
+        viewModel.mobile_lastPlayedTile.removeAll();
+    }
+
 
     ///general functions
     function changeGameState(state)
@@ -976,6 +982,7 @@
                 {
                     $(".state").hide();
                     $(".selectTileContainer").show();
+                    cleanUpBoard();
                 } break;
             case "InProgress":
                 {
@@ -997,8 +1004,10 @@
     });
 
     $("#takeTile").click(function () {
-        gameHub.server.takeTile(gameCode);
-        $(this).removeClass("takeEnabled");
+        if ($(this).hasClass("takeEnabled")) {
+            gameHub.server.takeTile(gameCode);
+            $(this).removeClass("takeEnabled");
+        }
     });
 
 
