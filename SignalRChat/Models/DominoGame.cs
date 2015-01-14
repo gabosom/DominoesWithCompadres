@@ -22,7 +22,7 @@ namespace DominoesWithCompadres.Models
         private Random _RandomNumberGenerator { get; set; }
         
         private bool ReadyForRound { get; set; }
-
+        private List<int> _IDsforTiles { get; set; }
         
         public DominoGame()
         {
@@ -31,15 +31,19 @@ namespace DominoesWithCompadres.Models
             this.AvailableTiles = new List<Tile>();
             this.State = GameState.Created;
             this.ReadyForRound = false;
-            this.GenerateTiles();
+            this._IDsforTiles = new List<int>();
             this._RandomNumberGenerator = new Random((int)DateTime.Now.Ticks);
-            //this.InitializeRound();
+            
+            
+            this.GenerateTiles();
         }
 
         private void GenerateTiles()
         {
             //TODO 20: shuffle tiles
             this.AvailableTiles.Clear();
+            this._IDsforTiles.Clear();
+            this._IDsforTiles.AddRange(Enumerable.Range(0, 28));
 
             //TODO 18: generate the right tile IDs
             for(int i = 0; i <= 6; i++)
@@ -50,7 +54,7 @@ namespace DominoesWithCompadres.Models
                     {
                          Value1 = i,
                          Value2 = j,
-                         ID = this.AvailableTiles.Count+1
+                         ID = this.GetNextIDForTile()
                     });
                 }
             }
@@ -285,6 +289,13 @@ namespace DominoesWithCompadres.Models
                 player.Tiles.Add(tileToTake);
             }
             return tileToTake;
+        }
+
+        private int GetNextIDForTile()
+        {
+            int numToReturn = this._IDsforTiles[this._RandomNumberGenerator.Next(this._IDsforTiles.Count)];
+            this._IDsforTiles.Remove(numToReturn);
+            return numToReturn;
         }
     }
 

@@ -54,7 +54,10 @@ namespace DominoesWithCompadres.Controllers
                 }
                 catch
                 {
-                    return View("../Home/Index", GameStartDetails);
+                    return View("../Home/Index", new JoinOrCreateGameModel()
+                    {
+                        createGame = GameStartDetails
+                    });
                 }
             }
             else
