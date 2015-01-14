@@ -12,19 +12,21 @@
     <br />
 
     bool first = true;
-    foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
-    {
-        @Html.Label(value)
-        if (first)
+    <div class="hideIfMobile">
+        @foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
         {
-            @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
-            first = false;
+            @Html.Label(value)
+            if (first)
+            {
+                @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
+                first=false;
+            }
+            else
+            {
+                @Html.RadioButtonFor(model => model.UserType, value)
+            }
         }
-        else
-        {
-        @Html.RadioButtonFor(model => model.UserType, value)
-        }
-    }
-    <br />
-    <input type="submit" value="Create" />
+        <br />
+    </div>
+        <input type="submit" value="Create" />
 }
