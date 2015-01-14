@@ -546,8 +546,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center bottom",
-                                    at: "center top",
+                                    my: "right bottom",
+                                    at: "right top",
                                     collision: "none"
                                 });
                             } break;
@@ -603,8 +603,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center top",
-                                    at: "center bottom",
+                                    my: "left top",
+                                    at: "left bottom",
                                     collision: "none"
                                 });
                             } break;
