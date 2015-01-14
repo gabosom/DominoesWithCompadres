@@ -321,7 +321,7 @@ namespace DominoesWithCompadres.Models
                 messageBuilder.Append(" won round with " + totalPoints + " points.");
             }
             this.CurrentRound.Results.Message = messageBuilder.ToString();
-            
+            this.CurrentRound.Results.PointsWon = totalPoints;
         }
 
         private void PlayerNextTurn()
