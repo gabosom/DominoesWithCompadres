@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoesWithCompadresSite", "SignalRChat\DominoesWithCompadresSite.csproj", "{22817C13-21E8-40A9-B9EC-8CB66A4DF7EC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoResources", "DominoResources\DominoResources.csproj", "{72F71226-CC59-4CDF-B2E1-D8BD809B5669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{22817C13-21E8-40A9-B9EC-8CB66A4DF7EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22817C13-21E8-40A9-B9EC-8CB66A4DF7EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22817C13-21E8-40A9-B9EC-8CB66A4DF7EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72F71226-CC59-4CDF-B2E1-D8BD809B5669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72F71226-CC59-4CDF-B2E1-D8BD809B5669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72F71226-CC59-4CDF-B2E1-D8BD809B5669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72F71226-CC59-4CDF-B2E1-D8BD809B5669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
