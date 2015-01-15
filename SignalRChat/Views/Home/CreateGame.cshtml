@@ -5,28 +5,47 @@
     @Html.ValidationSummary()
 }
 
+
 @using (Html.BeginForm("Start", "Game", FormMethod.Post))
 {
-    @Html.TextBoxFor(model => model.Create_UserDisplayName, new{id = "create_displayName"})
-    @Html.ValidationMessageFor(model => model.Create_UserDisplayName, "*");
-    <br />
+    <table>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.Create_UserDisplayName)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.Create_UserDisplayName, new { id = "create_displayName" })
+                @Html.ValidationMessageFor(model => model.Create_UserDisplayName, "*")
+            </td>
+        </tr>
 
-    bool first = true;
-    <div class="hideIfMobile">
-        @foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
-        {
-            @Html.Label(value)
-            if (first)
-            {
-                @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
-                first=false;
-            }
-            else
-            {
-                @Html.RadioButtonFor(model => model.UserType, value)
-            }
-        }
-        <br />
-    </div>
-        <input type="submit" value="Create" />
+        <tr class="hideIfMobile">
+            <td>Join As</td>
+            <td>
+                @{bool first = true;}
+                @foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
+                {
+                    <div>
+                        @Html.Label(value)
+                        @if (first)
+                        {
+                            @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
+                            first = false;
+                        }
+                        else
+                        {
+                            @Html.RadioButtonFor(model => model.UserType, value)
+                        }
+                    </div>
+                }
+            </td>
+        </tr>
+        
+        <tr>
+            <td>
+                <input type="submit" value="Create" />
+            </td>
+        </tr>
+        
+    </table>
 }
