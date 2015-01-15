@@ -417,11 +417,11 @@
             if(viewModel.playedTiles().length == 0)
             {
                 var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
-                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
+                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "last");
 
                 //add left and add right, they both work
-                $(".mobile_playLast").append(firstDropTarget);
-                $(".mobile_playFirst").append(lastDropTarget);
+                $(".mobile_playFirst").append(firstDropTarget);
+                $(".mobile_playLast").append(lastDropTarget);
 
                 $(firstDropTarget).position({
                     of: $(".mobile_playFirst"),
