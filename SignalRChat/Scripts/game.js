@@ -169,13 +169,15 @@
             {
                 case "first":
                     {
-                        self.mobile_firstPlayedTile.removeAll();
+                        if (self.mobile_firstPlayedTile.length == 3)
+                            self.mobile_firstPlayedTile.shift();
                         self.mobile_firstPlayedTile.push(tile);
                     }; break;
 
                 case "last":
                     {
-                        self.mobile_lastPlayedTile.removeAll();
+                        if (self.mobile_lastPlayedTile.length == 3)
+                            self.mobile_lastPlayedTile.shift();
                         self.mobile_lastPlayedTile.push(tile);
                     }break;
             }
@@ -448,18 +450,18 @@
                 else
                 {
                     WriteConsole("Generating droppable is happening");
-                    var firstOpenTile = viewModel.mobile_firstPlayedTile()[0];
-                    var lastOpenTile = viewModel.mobile_lastPlayedTile()[0];
+                    var firstTile = viewModel.playedTiles()[0];
+                    var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-                    var firstDropTarget = createDroppableTarget(firstOpenTile.value1, "first");
-                    var lastDropTarget = createDroppableTarget(lastOpenTile.value2, "last");
+                    var firstDropTarget = createDroppableTarget(firstTile.value1, "first");
+                    var lastDropTarget = createDroppableTarget(lastTile.value2, "last");
 
                     //add left and add right, they both work
                     $(".mobile_playFirst").append(firstDropTarget);
                     $(".mobile_playLast").append(lastDropTarget);
 
-                    positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstOpenTile.id + "']", "first");
-                    positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastOpenTile.id + "']", "last");
+                    positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstTile.id + "']", "first");
+                    positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastTile.id + "']", "last");
                 }
             }
         }
@@ -941,8 +943,8 @@
 
                         $(selector_lastTile).position({
                             of: $(".mobile_playLast"),
-                            my: "right",
-                            at: "right"
+                            my: "center",
+                            at: "center"
                         });
 
                         animateTilePlayedOnScreen(selector_lastTile, "last");
