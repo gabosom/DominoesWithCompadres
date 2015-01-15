@@ -27,8 +27,12 @@ namespace DominoesWithCompadres.Hubs
                             DisplayName = displayName,
                             ID = GameService.GeneratePlayerId()
                         };
-                        game.AddPlayer(newPlayer);
-                        Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                        if(game.AddPlayer(newPlayer))
+                            Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                        else
+                        { 
+                            //TODO: what do we show when player couldn't join game
+                        }
                     }break;
 
                 case UserType.Viewer:
@@ -66,11 +70,17 @@ namespace DominoesWithCompadres.Hubs
             if (game.IsEveryoneReady())
             {
                 Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
+                Clients.Group(gameCode).initializeRound(game.CurrentRound);
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
             }
 
         }
     
+        public void TakeTile(string gameCode)
+        {
+            GameService.UserTakesTile(Context.ConnectionId, gameCode, this);
+        }
+
         public void SelectedTile(string gameCode, int tileId)
         {
 
@@ -98,7 +108,8 @@ namespace DominoesWithCompadres.Hubs
                 {
                     game.StartRound();
                     Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                    Clients.Group(gameCode).removeAvailableTiles(28 - (7 * game.Players.Count));
+                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
             }
         }
@@ -144,7 +155,7 @@ namespace DominoesWithCompadres.Hubs
                     case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
                     case GameState.RoundFinished:
                         {
-                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
+                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
                             Clients.Group(gameCode).updateGameState(game.State.ToString());
                         } break;
                     case GameState.Finished: break;

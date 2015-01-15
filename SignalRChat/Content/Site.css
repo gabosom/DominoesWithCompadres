@@ -70,6 +70,8 @@ input[type="checkbox"].input-validation-error {
 #boardContainer{
     position:relative;
     height:600px;
+    clear:both;
+    width:100%;
 }
 
 .state{
@@ -81,7 +83,7 @@ input[type="checkbox"].input-validation-error {
     visibility:visible;
     display:block;
     height:600px;
-    width:800px;
+    width:100%;
     position:absolute;
     top:0px;
     left:0px;
@@ -113,6 +115,24 @@ input[type="checkbox"].input-validation-error {
 
 
 /**** Users selecting tiles ****/
+
+.takeDisabled{
+    color:#808080;
+}
+
+.takeEnabled{
+    color:red;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.passDisabled{
+
+}
+.passEnabled{
+
+}
+
 #selectTiles > .tile, .myTileContainer > .tile {
     float:left;
     margin-right:20px;
@@ -127,11 +147,22 @@ input[type="checkbox"].input-validation-error {
     padding:0px;
     background-color:white;
     border:1px solid black;
-
+    border-radius:5px;
     /*TODO-later: blg about this 
         http://stackoverflow.com/questions/3705937/document-click-not-working-correctly-on-iphone-jquery
         */
     cursor: pointer;
+
+    box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+    -moz-box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+    -webkit-box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+
 }
 
 .one{
@@ -189,12 +220,11 @@ input[type="checkbox"].input-validation-error {
     border-bottom: 1px solid black;
 }
 
-#selectTiles > .selected, .selected > tileHalf{
-    background-color:#4cff00;
+#selectTiles > .selected{
     border-color: #4cff00;
 }
 
-#selectTiles > .otherSelected, .otherSelected > tileHalf{
+#selectTiles > .otherSelected{
     background-color:#808080;
     border-color:#808080;
 }
@@ -246,11 +276,34 @@ input[type="checkbox"].input-validation-error {
 }
 
 
+/*** Hide really small resolution ***/
+#resolutionTooSmall{
+    display:none;
+}
 
 /*** Hide mobile stuff ***/
 .mobile_playabbleArea
 {
     display:none;
+}
+
+.playerList.left
+{
+    float:left;
+}
+
+.playerList.right{
+    float:right;
+}
+
+@media (max-width: 478px){
+    #resolutionTooSmall{
+        display:block;
+    }
+
+    #gameContainer{
+        display:none;
+    }
 }
 
 
@@ -281,14 +334,20 @@ input[type="checkbox"].input-validation-error {
 
     /* Layout for mobile divs in game*/
 
-    .mobile_playabbleContainer
+    .gameInfoContainer
     {
         width: 100%;
-        height:50%;
+        height:25%;
     }
+
+    #boardContainer{
+        width:100%;
+        height:75%;
+    }
+
         .mobile_playabbleArea
         {
-            height:50%;
+            height:80%;
             display:block;
             width:30%;
         }
@@ -303,6 +362,11 @@ input[type="checkbox"].input-validation-error {
         {
             float:right;
             border:1px solid blue;        
+        }
+
+        .gameInfo{
+            float:left;
+            width:40%;
         }
         
     .myTileAndMoveArea
@@ -347,7 +411,7 @@ input[type="checkbox"].input-validation-error {
         height:100%;
         padding-bottom:0px;
     }     
-    html, #gameContainer, .gameInProgress, #boardContainer, #selectTiles, .selectTileContainer{
+    html, #gameContainer, .gameInProgress, #selectTiles, .selectTileContainer{
         height:100%;
     }
 
@@ -389,9 +453,15 @@ input[type="checkbox"].input-validation-error {
         margin-right:15px;
     }
 
+    .tile{
+        border-radius:2px;
+        -moz-border-radius:2px;
+        -webkit-border-radius:2px;
+    }
+
     .tileHalf{
         height:50%;
-        background-size:100%;
+        background-size:90%;
         width:100%;
     }
 }

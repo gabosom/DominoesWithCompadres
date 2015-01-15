@@ -92,6 +92,10 @@
             this.myRoundTiles.push(this.getTile(tileId));
         };
 
+        this.addRoundTileWithTile = function (tile) {
+            this.myRoundTiles.push(tile);
+        };
+
         this.getTile = function (tileId) {
             for(i = 0; i < this.availableTiles().length; i++)
             {
@@ -106,6 +110,7 @@
 
             //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles.removeAll();
+            self.myRoundTiles.removeAll();
         };
 
         self.selectMyTile = function (selectedTile, event) {
@@ -199,8 +204,23 @@
         viewModel.setAvailableTiles(tiles);
     };
 
+    gameHub.client.removeAvailableTiles = function (howMany) {
+        //removes available tiles so it has the count, they don't represent the actual available tiles left.
+        for (i = 0; i < howMany; i++)
+            viewModel.availableTiles.pop();
+    };
+
     gameHub.client.updateGameState = function (state) {
         changeGameState(state);
+    };
+
+    gameHub.client.addTakenTile = function (tile, playerId) {
+        //TODO: make animation for taken tile
+
+        if (gameHub.connection.id == playerId)
+            viewModel.addRoundTileWithTile(tile);
+        
+        viewModel.availableTiles.pop();
     };
 
     gameHub.client.otherUserTookTile = function (tileId) {
@@ -231,9 +251,6 @@
     gameHub.client.initializeRound = function (currentRound) {
         viewModel.initializeRound(currentRound);
         initializeRound();
-
-        //TODO 5: viewModel changes to current player should trigger update user, for now, forcing manually
-        updatePlayerInTurn(viewModel.playerInTurn());
     };
 
     gameHub.client.userPlayedTile = function (tile, nextPlayerInTurn, listPosition) {
@@ -242,20 +259,19 @@
         updatePlayerInTurn(nextPlayerInTurn);
     };
 
-    gameHub.client.roundFinished = function (roundResults) {
+    gameHub.client.roundFinished = function (roundResults, players) {
 
         WriteConsole("Round over");
         WriteConsole(JSON.stringify(roundResults));
         //TODO: need to use knockout mapping to fix this better, for now, I will just send all the players and update the array
         //gamehub service should only inclue the winners in the round results
-        viewModel.updatePlayers(roundResults.winners);
+        viewModel.updatePlayers(players);
 
         //set all the data in the view model
         viewModel.setMessage(roundResults.message);
 
         //the message will be shown when clients get the update game state event
     };
-
 
     
 
@@ -318,7 +334,15 @@
 
                 if(!canMakeMove)
                 {
-                    $(".btnPassTurn").css("visibility", "visible");
+                    if (viewModel.availableTiles().length > 0)
+                    {
+                        $("#takeTileContainer").addClass("takeEnabled");
+                    }
+                    else
+                    {
+                        noMorePlaysAction("pass");
+                        $(".btnPassTurn").addClass("passEnabled");
+                    }
                 }
 
             }
@@ -523,8 +547,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center bottom",
-                                    at: "center top",
+                                    my: "right bottom",
+                                    at: "right top",
                                     collision: "none"
                                 });
                             } break;
@@ -580,8 +604,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center top",
-                                    at: "center bottom",
+                                    my: "left top",
+                                    at: "left bottom",
                                     collision: "none"
                                 });
                             } break;
@@ -649,12 +673,17 @@
                     //turns up, right, down, right
                     if(listPosition == "first")
                     {
+                        if (list_firstDirectionIndex == 2)
+                            invertTileValueDivs(selector)
                         list_firstDirectionIndex = ++list_firstDirectionIndex%4;
                     }
 
                         //turns down left up left
                     else
                     {
+                        if (list_lastDirectionIndex == 2)
+                            invertTileValueDivs(selector)
+
                         list_lastDirectionIndex = ++list_lastDirectionIndex % 4;
                     }
                 }
@@ -913,11 +942,34 @@
     /***** gameplay *****/
     function initializeRound()
     {
-        //TODO 35: set the correct size for roundTileBoard, for now it's hardcoded
-
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
         tilesInRoundClient = 0;
+        list_firstDirectionIndex = 0;
+        list_lastDirectionIndex = 0;
+        
+
+        noMorePlaysAction("take");
+
+    }
+
+
+    function noMorePlaysAction(value)
+    {
+        /// <summary>Depending on how many available tiles are left, it shows the take tile or pass button. "pass" or "take" are the only options</summary>
+        /// <param name="value" type="string">the action to show</param>
+        switch (value) {
+            case "take":
+                {
+                    $("#takeTileContainer").show();
+                    $("#passTurnContainer").hide();
+                } break;
+            case "pass":
+                {
+                    $("#takeTileContainer").hide();
+                    $("#passTurnContainer").show();
+                } break;
+        }
     }
 
     //this is sending the tile object {id, value1, value2}
@@ -929,6 +981,12 @@
 
         $(".droppableTileZone[class*='" + getDropClassForValue(tile.value1) + "']").css("visibility", "visible");
         $(".droppableTileZone[class*='" + getDropClassForValue(tile.value2) + "']").css("visibility", "visible");
+    }
+
+    function cleanUpBoard()
+    {
+        viewModel.mobile_firstPlayedTile.removeAll();
+        viewModel.mobile_lastPlayedTile.removeAll();
     }
 
 
@@ -945,16 +1003,15 @@
 
             case "SelectingTiles":
                 {
+                    $(".readyInfoShown").addClass("readyInfoHidden").removeClass("readyInfoShown")
                     $(".state").hide();
                     $(".selectTileContainer").show();
+                    cleanUpBoard();
                 } break;
             case "InProgress":
                 {
                     $(".state").hide();
                     $(".gameInProgress").show();
-
-                    //TODO 37: will need to refactor this once I have a table/viewer mode only
-                    initializeRound();
                 } break;
         }
 
@@ -964,11 +1021,47 @@
 
 
     $(".btnPassTurn").click(function () {
-        //TODO 38: only do this when in turn
 
+        //TODO 38: only do this when in turn
         gameHub.server.userPlayedTile(gameCode, null, null)
+        $(this).removeClass("passEnabled");
     });
 
+    $("#takeTileContainer").click(function () {
+        if ($(this).hasClass("takeEnabled")) {
+            gameHub.server.takeTile(gameCode);
+            $(this).removeClass("takeEnabled");
+        }
+    });
+
+    //bind window change events
+    $(window).bind("resize", function (e) {
+        updateUserScreenData();
+
+        //TODO 55: redraw tiles as needed when passing from one layout to the other
+    })
+
+    function updateUserScreenData()
+    {
+        //determine screensize & orientation
+        var screenWidth = $(document).width();
+        var screenHeight = $(document).height();
+
+        //landscape
+        if (screenWidth > screenHeight) {
+            viewModel.screenOrientation("landscape");
+        }
+        else {
+            viewModel.screenOrientation("portrait");
+        }
+
+        if (screenWidth <= 768) {
+            viewModel.isUserSmallScreen(true);
+        }
+        else {
+            viewModel.isUserSmallScreen(false);
+        }
+    }
 
     function setupPlayer()
     {
@@ -982,28 +1075,7 @@
             $("#btnRoundReady").show();
         }
 
-        //determine screensize & orientation
-        var screenWidth = $(document).width();
-        var screenHeight = $(document).height();
-
-        //landscape
-        if(screenWidth > screenHeight)
-        {
-            viewModel.screenOrientation("landscape");
-        }
-        else
-        {
-            viewModel.screenOrientation("portrait");
-        }
-
-        if(screenWidth <= 768)
-        {
-            viewModel.isUserSmallScreen(true);
-        }
-        else
-        {
-            viewModel.isUserSmallScreen(false);
-        }
+        updateUserScreenData();
     }
 
 
