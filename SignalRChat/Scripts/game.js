@@ -336,13 +336,11 @@
                 {
                     if (viewModel.availableTiles().length > 0)
                     {
-                        $("#takeTile").addClass("takeEnabled");
-                        $(".btnPassTurn").hide();
+                        $("#takeTileContainer").addClass("takeEnabled");
                     }
                     else
                     {
-                        $("#takeTile").hide();
-                        $(".btnPassTurn").css("visibility", "visible");
+                        noMorePlaysAction("pass");
                         $(".btnPassTurn").addClass("passEnabled");
                     }
                 }
@@ -944,8 +942,6 @@
     /***** gameplay *****/
     function initializeRound()
     {
-        //TODO 35: set the correct size for roundTileBoard, for now it's hardcoded
-
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
         tilesInRoundClient = 0;
@@ -953,7 +949,27 @@
         list_lastDirectionIndex = 0;
         
 
-        $("#takeTile").show();
+        noMorePlaysAction("take");
+
+    }
+
+
+    function noMorePlaysAction(value)
+    {
+        /// <summary>Depending on how many available tiles are left, it shows the take tile or pass button. "pass" or "take" are the only options</summary>
+        /// <param name="value" type="string">the action to show</param>
+        switch (value) {
+            case "take":
+                {
+                    $("#takeTileContainer").show();
+                    $("#passTurnContainer").hide();
+                } break;
+            case "pass":
+                {
+                    $("#takeTileContainer").hide();
+                    $("#passTurnContainer").show();
+                } break;
+        }
     }
 
     //this is sending the tile object {id, value1, value2}
@@ -1005,13 +1021,13 @@
 
 
     $(".btnPassTurn").click(function () {
-        //TODO 38: only do this when in turn
 
+        //TODO 38: only do this when in turn
         gameHub.server.userPlayedTile(gameCode, null, null)
         $(this).removeClass("passEnabled");
     });
 
-    $("#takeTile").click(function () {
+    $("#takeTileContainer").click(function () {
         if ($(this).hasClass("takeEnabled")) {
             gameHub.server.takeTile(gameCode);
             $(this).removeClass("takeEnabled");

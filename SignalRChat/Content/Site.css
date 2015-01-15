@@ -147,11 +147,22 @@ input[type="checkbox"].input-validation-error {
     padding:0px;
     background-color:white;
     border:1px solid black;
-
+    border-radius:5px;
     /*TODO-later: blg about this 
         http://stackoverflow.com/questions/3705937/document-click-not-working-correctly-on-iphone-jquery
         */
     cursor: pointer;
+
+    box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+    -moz-box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+    -webkit-box-shadow:
+        inset 0px -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/
+        inset 0px 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+
 }
 
 .one{
@@ -209,12 +220,11 @@ input[type="checkbox"].input-validation-error {
     border-bottom: 1px solid black;
 }
 
-#selectTiles > .selected, .selected > tileHalf{
-    background-color:#4cff00;
+#selectTiles > .selected{
     border-color: #4cff00;
 }
 
-#selectTiles > .otherSelected, .otherSelected > tileHalf{
+#selectTiles > .otherSelected{
     background-color:#808080;
     border-color:#808080;
 }
@@ -441,6 +451,12 @@ input[type="checkbox"].input-validation-error {
         height:60px;
         margin-bottom:15px;
         margin-right:15px;
+    }
+
+    .tile{
+        border-radius:2px;
+        -moz-border-radius:2px;
+        -webkit-border-radius:2px;
     }
 
     .tileHalf{

@@ -66,10 +66,16 @@
                         <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
                     </div>
                 </div>
-                <div id="takeTile" class="takeDisabled">
-                    Robar
+                <div id="noPlaysWithTiles">
+                    <div id="takeTileContainer" class="takeDisabled">
+                        Robar
+                    </div>
+                    <div id="passTurnContainer">
+                        <input type="button" value="pass" class="btnPassTurn" />
+                    </div>
+                    
                 </div>
-                <input type="button" value="pass" class="btnPassTurn" />
+                
             </div>
             
             
