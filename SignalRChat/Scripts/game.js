@@ -119,6 +119,12 @@
             {
                 if (userInTurn)
                 {
+
+                    //finish any animations going
+                    if (droppableTargetAnimationTimer != null)
+                        finishAllAnimations();
+
+
                     $(".myTileContainer > .tile").removeClass("selected");
                 
                     self.mySelectedTile(selectedTile);
@@ -439,31 +445,47 @@
             }
             else
             {
-                //if something is being animated, just wait
-                if ($(".mobile_playabbleArea > .tile").filter(":animated").length > 0)
+                if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
                 {
-                    WriteConsole("Generating droppable is paused, animation was happening");
+                    //if something is being animated, just wait
+                    if ($(".mobile_playabbleArea > .tile").filter(":animated").length > 0)
+                    {
+                        WriteConsole("Generating droppable is paused, animation was happening");
 
-                    //TODO: could make the callback another function so when it calls back, it saves the first comparison again
-                    droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 1000);
-                }
-                else
-                {
-                    WriteConsole("Generating droppable is happening");
-                    var firstTile = viewModel.playedTiles()[0];
-                    var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
+                        //TODO: could make the callback another function so when it calls back, it saves the first comparison again
+                        droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 1000);
+                    }
+                    else
+                    {
+                        droppableTargetAnimationTimer = null;
+                        WriteConsole("Generating droppable is happening");
+                        var firstTile = viewModel.playedTiles()[0];
+                        var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-                    var firstDropTarget = createDroppableTarget(firstTile.value1, "first");
-                    var lastDropTarget = createDroppableTarget(lastTile.value2, "last");
+                        var firstDropTarget = createDroppableTarget(firstTile.value1, "first");
+                        var lastDropTarget = createDroppableTarget(lastTile.value2, "last");
 
-                    //add left and add right, they both work
-                    $(".mobile_playFirst").append(firstDropTarget);
-                    $(".mobile_playLast").append(lastDropTarget);
+                        //add left and add right, they both work
+                        $(".mobile_playFirst").append(firstDropTarget);
+                        $(".mobile_playLast").append(lastDropTarget);
 
-                    positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstTile.id + "']", "first");
-                    positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastTile.id + "']", "last");
+                        positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstTile.id + "']", "first");
+                        positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastTile.id + "']", "last");
+                    }
                 }
             }
+        }
+    }
+
+    function finishAllAnimations()
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+
+        }
+        else
+        {
+            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(true, true);
         }
     }
 
@@ -1066,6 +1088,19 @@
     //this is sending the tile object {id, value1, value2}
     function showPossibleTilePlays(tile)
     {
+        if (!viewModel.isUserSmallScreen())
+        {
+
+        }
+        else
+        {
+            if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
+            {
+                droppableTargetAnimationTimer = null;
+                generateDroppableZonesForPlays();                
+            }
+        }
+
         //hide all current options
         $(".droppableTileZone").css("visibility", "hidden");
 
