@@ -4,7 +4,7 @@
     Sorry, resolution is too small to play
 </div>
 <div id="gameContainer">
-    <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
+    
 
     <input type="hidden" id="gameCode" value="@Model.GameCode" />
     <input type="hidden" id="userType" value="@ViewBag.UserType" />
@@ -18,7 +18,8 @@
             </div>
         </div>
         <div class="gameInfo">
-            <div id="playerContiner">
+            <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
+            <div id="playerContainer">
                 <div data-bind="foreach: players" class="playerList left">
                     <div class="player" data-bind="if: $index() % 2 ==0">
                         <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span> : <span data-bind="text: points"></span>
