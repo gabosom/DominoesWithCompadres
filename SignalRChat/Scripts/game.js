@@ -121,8 +121,7 @@
                 {
 
                     //finish any animations going
-                    if (droppableTargetAnimationTimer != null)
-                        finishAllAnimations();
+                    finishAllAnimations();
 
 
                     $(".myTileContainer > .tile").removeClass("selected");
@@ -884,6 +883,9 @@
 
         else
         {
+            //finish all animations
+            finishAllAnimations();
+
             //if first in the list, then shift. if end of list, then push
             switch (listPosition) {
                 case "first": {
