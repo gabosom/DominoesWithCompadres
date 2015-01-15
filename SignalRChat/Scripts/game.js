@@ -164,17 +164,21 @@
         };
 
         self.mobile_addTile = function (tile, listPosition)        {
-            switch(listPosition)
+
+            //keep 2 tiles
+            switch (listPosition)
             {
                 case "first":
                     {
-                        self.mobile_firstPlayedTile.removeAll();
+                        if (self.mobile_firstPlayedTile().length == 3)
+                            self.mobile_firstPlayedTile.shift();
                         self.mobile_firstPlayedTile.push(tile);
                     }; break;
 
                 case "last":
                     {
-                        self.mobile_lastPlayedTile.removeAll();
+                        if(self.mobile_lastPlayedTile().length == 3)
+                            self.mobile_lastPlayedTile.shift();
                         self.mobile_lastPlayedTile.push(tile);
                     }break;
             }
@@ -519,6 +523,66 @@
         return drop;
     }
 
+    function animateTilePlayedOnBoard(selectorForTile, listPosition)
+    {
+        /// <summary>Animates tiles played on board. ListPosition = "first", "last", "initial"</summary>
+        /// <param name="selectorForTile" type="string or DOM object">item to be animated</param>
+        /// <param name="listPosition" type="string">place where it's animated</param>
+        if (!viewModel.isUserSmallScreen())
+        {
+
+        }
+        else
+        {
+            switch(listPosition)
+            {
+                case "first":
+                    {
+                        /* animations */
+                        var movementFirstDesc = "-=" + $(selectorForTile).width() + "px";
+
+                        $(".mobile_playFirst > .playTile").animate({
+                            left: movementFirstDesc
+                        }, {
+                            duration: 1000,
+                            queue: false
+                        });
+                    } break;
+                case "last":
+                    {
+                        /* animations */
+                        var movementLastDesc = "+=" + $(selectorForTile).width() + "px";
+
+                        $(".mobile_playLast > .playTile").animate({
+                            left: movementLastDesc
+                        }, {
+                            duration: 1000,
+                            queue: false
+                        })
+                    } break;
+                case "initial":
+                    {
+                        /* animations */
+                        var movementFirstDesc = "-=" + $(selectorForTile).width() + "px";
+                        var movementLastDesc = "+=" + $(selectorForTile).width() + "px";
+
+                        $(".mobile_playFirst > .playTile").animate({
+                            left: movementFirstDesc
+                        }, {
+                            duration: 1000,
+                            queue: false
+                        });
+
+                        $(".mobile_playLast > .playTile").animate({
+                            left: movementLastDesc
+                        }, {
+                            duration: 1000,
+                            queue: false
+                        })
+                    } break;
+            }
+        }
+    }
     
     function positionTileOnBoard(selector, anchorSelector, listPosition)
     {
@@ -710,16 +774,16 @@
                 case "first": {
                     $(selector).position({
                         of: $(anchorSelector),
-                        my: "left",
-                        at: "right",
+                        my: "center",
+                        at: "center",
                         collision: "none"
                     });
                 } break;
                 case "last": {
                     $(selector).position({
                         of: $(anchorSelector),
-                        my: "right",
-                        at: "left",
+                        my: "center",
+                        at: "center",
                         collision: "none"
                     });
                 } break;
@@ -763,17 +827,23 @@
                 viewModel.mobile_addTile(tile, "first");
                 viewModel.mobile_addTile(tile, "last");
 
-                $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+                var selectorForFirstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                var selectorForLastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                $(selectorForFirstTile).position({
                     of: $(".mobile_playFirst"),
-                    my: "left",
-                    at: "left"
+                    my: "center",
+                    at: "center"
                 });
 
-                $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                $(selectorForLastTile).position({
                     of: $(".mobile_playLast"),
-                    my: "right",
-                    at: "right"
+                    my: "center",
+                    at: "center"
                 });
+
+                animateTilePlayedOnBoard(selectorForFirstTile, "initial");
+                
             }
         }
 
@@ -812,13 +882,16 @@
                     }
                     else
                     {
+                        var selectorForFirstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+
                         viewModel.mobile_addTile(tile, "first");
 
-                        $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+                        $(selectorForFirstTile).position({
                             of: $(".mobile_playFirst"),
-                            my: "left",
-                            at: "left"
+                            my: "center",
+                            at: "center"
                         });
+                        animateTilePlayedOnBoard(selectorForFirstTile, "first")
                     }
 
                 } break;
@@ -850,13 +923,16 @@
                     }
                     else
                     {
+                        var selectorForLastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
                         viewModel.mobile_addTile(tile, "last");
 
-                        $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                        $(selectorForLastTile).position({
                             of: $(".mobile_playLast"),
-                            my: "right",
-                            at: "right"
+                            my: "center",
+                            at: "center"
                         });
+
+                        animateTilePlayedOnBoard(selectorForLastTile, "last");
                     }
                 } break;
             }
