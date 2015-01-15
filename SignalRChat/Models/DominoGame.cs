@@ -62,6 +62,18 @@ namespace DominoesWithCompadres.Models
                     });
                 }
             }
+
+            //shuffle #1
+            //for(int i = 0; i < this.AvailableTiles.Count; i++)
+            //{
+            //    int randomIndex = this._RandomNumberGenerator.Next(28 - i);
+            //    Tile shuffledTile = this.AvailableTiles[randomIndex];
+            //    this.AvailableTiles[randomIndex] = this.AvailableTiles[i];
+            //    this.AvailableTiles[i] = shuffledTile;
+            //}
+
+            //shuffle #2
+            this.AvailableTiles = this.AvailableTiles.OrderBy(tile => this._RandomNumberGenerator.Next()).ToList<Tile>();
         }
 
         public void StartRound()

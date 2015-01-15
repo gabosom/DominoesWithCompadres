@@ -108,8 +108,6 @@
 
         self.initializeRound = function(round){
             self.setPlayerInTurn(round.playerInTurn);
-
-            //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles.removeAll();
             self.myRoundTiles.removeAll();
         };
