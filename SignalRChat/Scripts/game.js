@@ -110,10 +110,7 @@
 
             //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles.removeAll();
-
-            //set correct # of available tiles, this helps with the logic to show steal or pass button
-            for (i = 0; i < self.availableTiles().length; i++)
-                self.availableTiles.pop();
+            self.myRoundTiles.removeAll();
         };
 
         self.selectMyTile = function (selectedTile, event) {
@@ -207,6 +204,12 @@
         viewModel.setAvailableTiles(tiles);
     };
 
+    gameHub.client.removeAvailableTiles = function (howMany) {
+        //removes available tiles so it has the count, they don't represent the actual available tiles left.
+        for (i = 0; i < howMany; i++)
+            viewModel.availableTiles.pop();
+    };
+
     gameHub.client.updateGameState = function (state) {
         changeGameState(state);
     };
@@ -248,9 +251,6 @@
     gameHub.client.initializeRound = function (currentRound) {
         viewModel.initializeRound(currentRound);
         initializeRound();
-
-        //TODO 5: viewModel changes to current player should trigger update user, for now, forcing manually
-        updatePlayerInTurn(viewModel.playerInTurn());
     };
 
     gameHub.client.userPlayedTile = function (tile, nextPlayerInTurn, listPosition) {
@@ -259,20 +259,19 @@
         updatePlayerInTurn(nextPlayerInTurn);
     };
 
-    gameHub.client.roundFinished = function (roundResults) {
+    gameHub.client.roundFinished = function (roundResults, players) {
 
         WriteConsole("Round over");
         WriteConsole(JSON.stringify(roundResults));
         //TODO: need to use knockout mapping to fix this better, for now, I will just send all the players and update the array
         //gamehub service should only inclue the winners in the round results
-        viewModel.updatePlayers(roundResults.winners);
+        viewModel.updatePlayers(players);
 
         //set all the data in the view model
         viewModel.setMessage(roundResults.message);
 
         //the message will be shown when clients get the update game state event
     };
-
 
     
 
@@ -950,6 +949,9 @@
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
         tilesInRoundClient = 0;
+        list_firstDirectionIndex = 0;
+        list_lastDirectionIndex = 0;
+        
 
         $("#takeTile").show();
     }

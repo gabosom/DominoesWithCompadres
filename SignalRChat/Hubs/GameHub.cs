@@ -70,6 +70,7 @@ namespace DominoesWithCompadres.Hubs
             if (game.IsEveryoneReady())
             {
                 Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
+                Clients.Group(gameCode).initializeRound(game.CurrentRound);
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
             }
 
@@ -107,7 +108,8 @@ namespace DominoesWithCompadres.Hubs
                 {
                     game.StartRound();
                     Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                    Clients.Group(gameCode).removeAvailableTiles(28 - (7 * game.Players.Count));
+                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
             }
         }
@@ -153,7 +155,7 @@ namespace DominoesWithCompadres.Hubs
                     case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
                     case GameState.RoundFinished:
                         {
-                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
+                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
                             Clients.Group(gameCode).updateGameState(game.State.ToString());
                         } break;
                     case GameState.Finished: break;
