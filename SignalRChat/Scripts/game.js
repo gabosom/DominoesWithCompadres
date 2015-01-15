@@ -11,6 +11,7 @@
     var list_firstDirectionIndex = 0;
     var list_lastDirectionMovement = ["down", "left", "up", "left"];
     var list_lastDirectionIndex = 0;
+    var droppableTargetAnimationTimer = null;
     
 
     var debug = true;
@@ -306,7 +307,6 @@
         {
             WriteConsole("It's MY turn");
             //need to generate possible options for plays
-            Debug_OutputArray(viewModel.playedTiles(), "Played tiles array");
             
             generateDroppableZonesForPlays();
 
@@ -437,22 +437,95 @@
             }
             else
             {
-                var firstOpenTile = viewModel.mobile_firstPlayedTile()[0];
-                var lastOpenTile = viewModel.mobile_lastPlayedTile()[0];
+                //if something is being animated, just wait
+                if ($(".mobile_playabbleArea > .tile").filter(":animated").length > 0)
+                {
+                    WriteConsole("Generating droppable is paused, animation was happening");
 
-                var firstDropTarget = createDroppableTarget(firstOpenTile.value1, "first");
-                var lastDropTarget = createDroppableTarget(lastOpenTile.value2, "last");
+                    //TODO: could make the callback another function so when it calls back, it saves the first comparison again
+                    droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 1000);
+                }
+                else
+                {
+                    WriteConsole("Generating droppable is happening");
+                    var firstOpenTile = viewModel.mobile_firstPlayedTile()[0];
+                    var lastOpenTile = viewModel.mobile_lastPlayedTile()[0];
 
-                //add left and add right, they both work
-                $(".mobile_playFirst").append(firstDropTarget);
-                $(".mobile_playLast").append(lastDropTarget);
+                    var firstDropTarget = createDroppableTarget(firstOpenTile.value1, "first");
+                    var lastDropTarget = createDroppableTarget(lastOpenTile.value2, "last");
 
-                positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstOpenTile.id + "']", "first");
-                positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastOpenTile.id + "']", "last");
+                    //add left and add right, they both work
+                    $(".mobile_playFirst").append(firstDropTarget);
+                    $(".mobile_playLast").append(lastDropTarget);
+
+                    positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstOpenTile.id + "']", "first");
+                    positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastOpenTile.id + "']", "last");
+                }
             }
         }
     }
 
+    function animateTilePlayedOnScreen(selectorForTile, listPosition)
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+        }
+        else
+        {
+            switch(listPosition)
+            {
+                case "first":
+                    {
+                        var movementForFirst = "-=" + $(selectorForTile).width() + "px";
+                        $(".mobile_playFirst > .playTile").animate(
+                            {
+                               left: movementForFirst
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+                    } break;
+
+                case "last":
+                    {
+                        var movementForLast = "+=" + $(selectorForTile).width() + "px";
+
+                        $(".mobile_playLast > .playTile").animate(
+                            {
+                                left: movementForLast
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+                    } break;
+
+                case "initial":
+                    {
+                        var movementForFirst = "-=" + $(selectorForTile).width() + "px";
+                        var movementForLast = "+=" + $(selectorForTile).width() + "px";
+                        $(".mobile_playFirst > .playTile").animate(
+                            {
+                                left: movementForFirst
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+
+                        $(".mobile_playLast > .playTile").animate(
+                            {
+                                left: movementForLast
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+                    } break;
+            }
+        }
+    }
 
     function getOpenValue(listPosition)
     {
@@ -763,17 +836,25 @@
                 viewModel.mobile_addTile(tile, "first");
                 viewModel.mobile_addTile(tile, "last");
 
-                $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+
+                var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                $(selector_firstTile).position({
                     of: $(".mobile_playFirst"),
-                    my: "left",
-                    at: "left"
+                    my: "center",
+                    at: "center"
                 });
 
-                $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                
+
+                $(selector_lastTile).position({
                     of: $(".mobile_playLast"),
-                    my: "right",
-                    at: "right"
+                    my: "center",
+                    at: "center"
                 });
+
+                animateTilePlayedOnScreen(selector_firstTile, "initial");
             }
         }
 
@@ -814,11 +895,15 @@
                     {
                         viewModel.mobile_addTile(tile, "first");
 
-                        $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+                        var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+
+                        $(selector_firstTile).position({
                             of: $(".mobile_playFirst"),
-                            my: "left",
-                            at: "left"
+                            my: "center",
+                            at: "center"
                         });
+
+                        animateTilePlayedOnScreen(selector_firstTile, "first");
                     }
 
                 } break;
@@ -852,11 +937,15 @@
                     {
                         viewModel.mobile_addTile(tile, "last");
 
-                        $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                        var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                        $(selector_lastTile).position({
                             of: $(".mobile_playLast"),
                             my: "right",
                             at: "right"
                         });
+
+                        animateTilePlayedOnScreen(selector_lastTile, "last");
                     }
                 } break;
             }
