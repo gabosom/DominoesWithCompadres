@@ -461,7 +461,7 @@ input[type="checkbox"].input-validation-error {
 
     .tileHalf{
         height:50%;
-        background-size:100%;
+        background-size:90%;
         width:100%;
     }
 }
