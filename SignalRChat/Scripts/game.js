@@ -195,10 +195,12 @@
     };
 
     gameHub.client.playerJoinedGame = function (player) {
+        WriteConsole("GameHub: Player joined game: " + player.displayName);
         viewModel.addPlayer(player);
     };
 
     gameHub.client.setupGame = function (game) {
+        WriteConsole("GameHub: Setting up game...");
         viewModel.initializeViewModel(game);
         changeGameState(game.State);
     };
@@ -257,6 +259,7 @@
     };
 
     gameHub.client.userPlayedTile = function (tile, nextPlayerInTurn, listPosition) {
+        WriteConsole("Gamehub: User Played Tile");
         playTileOnBoard(tile, listPosition);
 
         updatePlayerInTurn(nextPlayerInTurn);
@@ -376,7 +379,7 @@
 
     function generateDroppableZonesForPlays() {
 
-
+        WriteConsole("Generate Droppable Zones");
         if (!viewModel.isUserSmallScreen())
         {        
             //if the board is empty
@@ -404,6 +407,8 @@
 
                 var firstOpenValue = getOpenValue("first");
                 var lastOpenValue = getOpenValue("last");
+
+                WriteConsole("Open values= first: " + firstOpenValue + ", last: " + lastOpenValue);
 
                 var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
                 var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
@@ -463,6 +468,8 @@
 
                         var firstDropTarget = createDroppableTarget(firstTile.value1, "first");
                         var lastDropTarget = createDroppableTarget(lastTile.value2, "last");
+
+                        WriteConsole("Open values= first: " + firstTile.value1 + ", last: " + lastTile.value2);
 
                         //add left and add right, they both work
                         $(".mobile_playFirst").append(firstDropTarget);
