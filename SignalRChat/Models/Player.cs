@@ -16,16 +16,25 @@ namespace DominoesWithCompadres.Models
         public List<Tile> Tiles { get; set; }
         [JsonProperty("points")]
         public int Points { get; set; }
+        [JsonProperty("state")]
+        public UserState State { get; set; }
 
         public Player()
         {
             this.IsReady = false;
             this.Tiles = new List<Tile>();
+            this.State = UserState.Connected;
         }
 
         internal void AddTile(Tile t)
         {
             this.Tiles.Add(t);
         }
+    }
+
+    public enum UserState
+    {
+        Connected,
+        Disconnected
     }
 }

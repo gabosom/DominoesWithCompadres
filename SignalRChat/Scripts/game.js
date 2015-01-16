@@ -285,6 +285,9 @@
         //the message will be shown when clients get the update game state event
     };
 
+
+    /*** Connection issues ****/
+    
     
 
     // Start the connection.

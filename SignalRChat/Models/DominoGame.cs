@@ -390,6 +390,11 @@ namespace DominoesWithCompadres.Models
             this._IDsforTiles.Remove(numToReturn);
             return numToReturn;
         }
+
+        internal void RemoveViewer(string userConnectionId)
+        {
+            this.Viewers.Remove(this.Viewers.SingleOrDefault(v => v.ConnectionID.Equals(userConnectionId)));
+        }
     }
 
     public enum GameState

@@ -195,5 +195,40 @@ namespace DominoesWithCompadres.Utils
                 //TODO: user is not in turn, what to do here
             }
         }
+
+
+        public static void SendExceptionToClients(Exception e, string gameCode, GameHub gameHub)
+        {
+            gameHub.Clients.Group(gameCode).error(e);
+        }
+
+
+        /** Deal with user connections **/
+
+        public static void UserDisconnected(string gameCode, string userConnectionId, GameHub gamehub)
+        {
+            try
+            {
+                DominoGame game = GameService.Get(gameCode);
+
+                Player p = game.GetPlayer(userConnectionId);
+
+                //if a player was disconnected, need to notify. if its a viewer, who cares
+                if(p != null)
+                {
+                    p.State = UserState.Disconnected;
+                }
+                else
+                {
+                    game.RemoveViewer(userConnectionId);
+                }
+
+                gamehub.Clients.Group(gameCode).error(new Exception(p.DisplayName + " was disconnected."));
+            }
+            catch(Exception e)
+            {
+                SendExceptionToClients(e, gameCode, gamehub);
+            }
+        }
     }
 }
