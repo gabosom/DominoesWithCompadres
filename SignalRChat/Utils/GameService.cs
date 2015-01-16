@@ -1,9 +1,11 @@
-﻿using DominoesWithCompadres.Models;
+﻿using DominoesWithCompadres.Hubs;
+using DominoesWithCompadres.Models;
 using DominoesWithCompadres.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace DominoesWithCompadres.Utils
@@ -29,6 +31,74 @@ namespace DominoesWithCompadres.Utils
             GameService.CurrentGames.Add(NewGame);
 
             return NewGame;
+        }
+
+        public static bool PlayerJoined(string gameCode, string displayName, string userConnectionId, GameHub gameHub)
+        {
+            try
+            {
+                //add user to Game
+                DominoGame game = GameService.Get(gameCode);
+
+                Player newPlayer = new Player()
+                {
+                    ConnectionID = userConnectionId,
+                    DisplayName = displayName,
+                    ID = GameService.GeneratePlayerId()
+                };
+
+                bool couldAddPlayer = game.AddPlayer(newPlayer);
+                if (couldAddPlayer)
+                {
+                    gameHub.Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                    gameHub.Groups.Add(newPlayer.ConnectionID, gameCode);
+
+                    //TODO-later: blog about this needed this for sync issues while setting up the game
+                    Thread.Sleep(500);     
+                    gameHub.Clients.Caller.setupGame(game);       
+                    return true;
+                }
+                else
+                {
+                    //TODO: what do we show when player couldn't join game
+                    gameHub.Clients.Group(gameCode).error(new Exception("Game is full"));
+                    return false;
+                }
+
+            }
+            catch(Exception e)
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+                return false;
+            }
+        }
+
+        public static void ViewerJoined(string gameCode, string userConnectionId, GameHub gameHub)
+        {
+            try
+            {
+                //add user to Game
+                DominoGame game = GameService.Get(gameCode);
+
+                Viewer newViewer = new Viewer()
+                {
+                    ConnectionID = userConnectionId,
+                    ID = GameService.GeneratePlayerId()
+                };
+
+                game.AddViewer(newViewer);
+                gameHub.Groups.Add(newViewer.ConnectionID, gameCode);
+
+                //needed this for sync issues while setting up the game
+                Thread.Sleep(500);     
+                gameHub.Clients.Caller.setupGame(game);       
+                
+                
+            }
+            catch (Exception e)
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+            }
         }
 
         private static string GenerateGameID()

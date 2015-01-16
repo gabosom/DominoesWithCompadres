@@ -14,48 +14,21 @@ namespace DominoesWithCompadres.Hubs
     {
         public void JoinGame(string displayName, string gameCode, UserType userType)
         {
-            //add user to Game
-            DominoGame game = GameService.Get(gameCode);
-            
+
+            bool userJoinedSuccessfully = false;
             switch(userType)
             {
                 case UserType.Player:
                     {
-                        Player newPlayer = new Player()
-                        {
-                            ConnectionID = Context.ConnectionId,
-                            DisplayName = displayName,
-                            ID = GameService.GeneratePlayerId()
-                        };
-                        if(game.AddPlayer(newPlayer))
-                            Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
-                        else
-                        { 
-                            //TODO: what do we show when player couldn't join game
-                        }
+                        userJoinedSuccessfully = GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, this);                        
                     }break;
 
                 case UserType.Viewer:
                     {
-                        Viewer newViewer = new Viewer()
-                        {
-                            ConnectionID = Context.ConnectionId,
-                            ID = GameService.GeneratePlayerId()
-                        };
-                        game.AddViewer(newViewer);
+                        GameService.ViewerJoined(gameCode, Context.ConnectionId, this);
                     }break;
             }
-            
-            
 
-            
-
-            //add user to SignalR group
-            Groups.Add(Context.ConnectionId, gameCode);
-
-            Thread.Sleep(500);
-
-            Clients.Caller.setupGame(game);            
         }
     
         public void UserReady(string gameCode)

@@ -197,6 +197,12 @@
     ******************/
     var gameHub = $.connection.gameHub;
 
+    gameHub.client.error = function(errorObject)
+    {
+        var toShow = errorObject.Code + ": " + errorObject.Message;
+        alert(toShow);
+    };
+
     gameHub.client.playerJoinedGame = function (player) {
         viewModel.addPlayer(player);
     };
@@ -283,6 +289,8 @@
 
     // Start the connection.
     $.connection.hub.start().done(function () {
+
+        gameHub.state.gameCode = gameCode;
 
         //make user join game
         gameHub.server.joinGame(displayName, gameCode, userType);
