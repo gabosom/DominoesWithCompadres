@@ -15,6 +15,14 @@
 
     var debug = true;
 
+    function WriteConsole(message)
+    {
+        if(debug == true)
+        {
+            console.log(message)
+        }
+    }
+
 
     function ViewModel() {
         var self = this;
@@ -1234,23 +1242,11 @@
 
     if(debugConsoleEnabled)
     {
-        $("#debugConsole").tabs();
+        $("#debugConsole").tabs()
 
         $("#toggleDebugConsoleContainer > a").click(function () {
             $("#debugConsole").toggle();
         })
-    }
-
-    function WriteConsole(message) {
-        if (debug == true) {
-            console.log(message)
-            if(debugConsoleEnabled)
-            {
-                if ($("#debug_consoleViewer").children("div").length > 60)
-                    $("#debug_consoleViewer > div").first().remove();
-                $("#debug_consoleViewer").append("<div>" + message + "</div>");
-            }
-        }
     }
 
 });

@@ -8,6 +8,16 @@
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
+    <div id="debugConsole">
+        <ul>
+            <li><a href="#debug_consoleViewer">Console</a></li>
+            <li><a href="#debug_playedTiles">PlayedTiles</a></li>
+            <li><a href="#debug_viewModel">View Model</a></li>
+        </ul>
+        <div id="debug_consoleViewer"></div>
+        <div id="debug_playedTiles"></div>
+        <div id="debug_viewModel"></div>
+    </div>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -17,12 +27,18 @@
                     <span class="icon-bar"></span>
                 </button>
                 @Html.ActionLink("Dominoes with Compadres", "Index", "Home", null, new { @class = "navbar-brand" })
+                @if (DominoesWithCompadres.Utils.SiteSettings.DebugConsole)
+                {
+                    <span id="toggleDebugConsoleContainer"><a href="#" id="btnToggleDebugConsole">Show console</a></span>
+                }
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
                     <li>@Html.ActionLink("About", "About", "Home")</li>
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    
+                        
                 </ul>
             </div>
         </div>
@@ -34,7 +50,19 @@
             <p>&copy; @DateTime.Now.Year - Jorge Gabuardi</p>
         </footer>
     </div>
-
+    
+    @if(DominoesWithCompadres.Utils.SiteSettings.DebugConsole)
+    {
+        <script>
+            var debugConsoleEnabled = true;
+        </script>
+    }
+    else
+    {
+        <script>
+            var debugConsoleEnabled = false;
+        </script>
+    }
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
