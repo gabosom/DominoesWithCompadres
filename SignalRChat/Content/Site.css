@@ -285,7 +285,7 @@ input[type="checkbox"].input-validation-error {
 /***** ALL THE DEBUGGING STUFF GOES HERE ******/
 #debugConsole
 {
-    margin-top:60px;
+    margin-top:90px;
     display:none;
     background-color:black;
     color: white;
@@ -301,7 +301,14 @@ input[type="checkbox"].input-validation-error {
 }
 
 
+.debug_playedTiles_table, .debug_playedTiles_table td
+{
+    border:1px solid white;
+}
 
+.debug_playedTiles_table td{
+    padding:5px;
+}
 
 
 
@@ -502,5 +509,11 @@ input[type="checkbox"].input-validation-error {
         height:50%;
         background-size:90%;
         width:100%;
+    }
+
+
+    #debugConsole
+    {
+        margin-top:50px;
     }
 }
