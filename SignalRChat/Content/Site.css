@@ -337,13 +337,13 @@ input[type="checkbox"].input-validation-error {
     .gameInfoContainer
     {
         width: 100%;
-        height:25%;
+        height:35%;
         padding-top:10px;
     }
 
     #boardContainer{
         width:100%;
-        height:75%;
+        height:65%;
     }
 
         .mobile_playabbleArea

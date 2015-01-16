@@ -120,6 +120,9 @@ namespace DominoesWithCompadres.Models
             if (this.Players.Count < 4)
             {
                 this.Players.Add(p);
+
+                if (this.Players.Count > 0)
+                    this.State = GameState.WaitingUsersReady;
                 return true;
             }
             else
@@ -153,13 +156,14 @@ namespace DominoesWithCompadres.Models
 
         public void PlayerReady(string ConnectionId)
         {
-            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created)
+            this.State = GameState.WaitingUsersReady;
+
+            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created || this.CurrentRound == null)
             {
-                this.State = GameState.WaitingUsersReady;
-                
                 //when restarting, need to remove previous tiles 
                 InitializeRound();
             }
+
 
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
