@@ -173,7 +173,11 @@
                         if (self.mobile_lastPlayedTile.length == 3)
                             self.mobile_lastPlayedTile.shift();
                         self.mobile_lastPlayedTile.push(tile);
-                    }break;
+                    } break;
+                case "initial": {
+                    self.mobile_addTile(tile, "first");
+                    self.mobile_addTile(tile, "last");
+                } break;
             }
         };
     };
@@ -391,7 +395,7 @@
             if (viewModel.playedTiles().length == 0) {
             
                 //generate tile droppable zone and add it
-                var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "first")
+                var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "initial")
 
                 $(".roundTileBoard").append(dropTarget);
 
@@ -433,8 +437,8 @@
             //if the board is empty
             if(viewModel.playedTiles().length == 0)
             {
-                var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
-                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "last");
+                var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
+                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
 
                 //add left and add right, they both work
                 $(".mobile_playFirst").append(firstDropTarget);
@@ -736,7 +740,7 @@
                     }
                 }
 
-                else
+                else if(listPosition == "last")
                 {
                     switch (list_lastDirectionIndex)
                     {
@@ -789,7 +793,17 @@
                             } break;
                     }
                 }
+                else if (listPosition == "initial")
+                {
+                    $(selector).addClass("firstTilePlayed");
 
+                    //put it in the middle
+                    $(selector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+                }
         
                 var containerOffset = $(allTileContainer).offset();
                 var containerPosition = $(allTileContainer).position();
@@ -875,9 +889,163 @@
         $(selector).children("div:first").remove();
     }
     
+    function switchTileHalves(tile)
+    {
+        var tempValue = tile.value1;
+        tile.value1 = tile.value2;
+        tile.value2 = tempValue;
+
+        return tile;
+    }
+
+    function playTileOnBoard(tile, listPosition)
+    {
+        //fixes the tiles value if needed
+        switch(listPosition)
+        {
+            case "first":{
+                //check if the values that connect go together, if not, make sure they are
+                var firstOpenValue = getOpenValue(listPosition);
+
+                //shift viewModel when appropriate
+                if(firstOpenValue != tile.value2){
+                    WriteConsole("Need to invert tile values");
+                    tile = switchTileHalves(tile);                    
+                }
+
+                //added new tile
+                viewModel.playedTiles.unshift(tile);
+
+            } break;
+
+            case "last": {
+
+                //check if the values that connect go together, if not, make sure they are
+                var lastOpenValue = getOpenValue(listPosition);
+
+                //shift viewModel when appropriate
+                if (lastOpenValue != tile.value1){
+                    WriteConsole("Need to invert tile values");
+                    tile = switchTileHalves(tile);
+                }
+
+                //added new tile at the end
+                viewModel.playedTiles.push(tile);
+
+            } break;
+
+            case "initial": {
+                viewModel.playedTiles.push(tile);
+            }
+        }
+
+
+
+        /************* NOW OFF TO FIGURING OUT WHERE TO PLACE THE PLAYED TILE***************/
+
+        //finish all animations
+        finishAllAnimations();
+
+        //if the user is in a big screen
+        if(!viewModel.isUserSmallScreen())
+        {
+            var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
+
+            switch (listPosition) {
+                case "first": {
+                    var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+
+                    if (list_firstDirectionIndex % 2 == 1)
+                        list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
+                } break;
+
+                case "last": {
+                    var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length-2].id + "']";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+
+                    if (list_lastDirectionIndex % 2 == 1)
+                        list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
+                } break;
+
+                case "initial": {
+                    var anchorSelector = ".roundTileBoard";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                }
+            }
+        }
+        else {
+
+            viewModel.mobile_addTile(tile, listPosition);
+            var tileSelector = "";
+            var anchorSelector = "";
+
+            switch (listPosition) {
+                case "first": {                    
+                    tileSelector = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                    anchorSelector = ".mobile_playFirst";
+
+                    //put tile on board and animate
+                    $(tileSelector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
+                } break;
+
+                case "last": {                    
+                    tileSelector = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+                    anchorSelector = ".mobile_playLast";
+
+                    //put tile on board and animate
+                    $(tileSelector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
+                } break;
+
+                case "initial": {
+                    f_tileSelector = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                    l_tileSelector = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                    f_anchorSelector = ".mobile_playFirst";
+                    l_anchorSelector = ".mobile_playLast";
+
+                    //put tile on board and animate
+                    $(f_tileSelector).position({
+                        of: $(f_anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    //put tile on board and animate
+                    $(l_tileSelector).position({
+                        of: $(l_anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(f_tileSelector, "first");
+                    animateTilePlayedOnScreen(l_tileSelector, "last");
+                }
+            }
+
+            
+        }
+
+        return tile;
+    }
 
     //tile is a tile object, listPosition is either "first" or "last"
-    function playTileOnBoard(tile, listPosition)
+    function playTileOnBoardOld(tile, listPosition)
     {
         //TODO 31: need to figure out what happens when joining mid game
         //when it's the first, need to anchor it to the middle
@@ -891,10 +1059,11 @@
 
             if(!viewModel.isUserSmallScreen())
             {
-                $(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").addClass("firstTilePlayed");
+                var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
+                $(tileSelector).addClass("firstTilePlayed");
 
                 //put it in the middle
-                $(".firstTilePlayed").position({
+                $(tileSelector).position({
                     of: $(".roundTileBoard"),
                     my: "center",
                     at: "center"

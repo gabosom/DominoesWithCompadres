@@ -82,7 +82,7 @@ namespace DominoesWithCompadres.Hubs
                 {
                     game.StartRound();
                     Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    Clients.Group(gameCode).removeAvailableTiles(28 - (7 * game.Players.Count));
+                    Clients.Group(gameCode).removeAvailableTiles((7 * game.Players.Count));
                     Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
             }
@@ -90,7 +90,6 @@ namespace DominoesWithCompadres.Hubs
 
         public void UserPlayedTile(string gameCode, Tile tilePlayed, string listPosition)
         {
-
             //TODO 16: try/catch
             DominoGame game = GameService.Get(gameCode);
 

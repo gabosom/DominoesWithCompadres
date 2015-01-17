@@ -162,7 +162,7 @@ input[type="checkbox"].input-validation-error {
 
 }
 .passEnabled{
-
+    visibility:visible;
 }
 
 #selectTiles > .tile, .myTileContainer > .tile {

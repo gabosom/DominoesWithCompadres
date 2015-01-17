@@ -262,6 +262,7 @@ namespace DominoesWithCompadres.Models
                     {
                         this.CurrentRound.PlayedTiles.AddLast(tilePlayed);
                     }break;
+                case "initial":
                 case "first":
                 default:
                     {
