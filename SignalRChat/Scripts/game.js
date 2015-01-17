@@ -457,7 +457,7 @@
                 if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
                 {
                     //if something is being animated, just wait
-                    if ($(".mobile_playabbleArea > .tile").filter(":animated").length > 0)
+                    if ($(".mobile_playabbleArea > .tile").add("#mobile_miniTile").filter(":animated").length > 0)
                     {
                         WriteConsole("Generating droppable is paused, animation was happening");
 
@@ -500,6 +500,40 @@
         }
     }
 
+    function animateTinyTileToPlay(listPosition) {
+
+        var positionToGoTo = null;
+        switch(listPosition)
+        {
+            case "first": positionToGoTo = $(".mobile_playFirst").position(); break;
+            case "last": positionToGoTo = $(".mobile_playLast").position(); break;
+        }
+
+        positionToGoTo.left = positionToGoTo.left + $(".mobile_playFirst").width() / 2;
+        positionToGoTo.top = positionToGoTo.top + $(".mobile_playFirst").height() / 2 - $("#mobile_miniTile").height()/2;
+
+        $("#mobile_miniTile").animate({
+            left: positionToGoTo.left,
+            top: positionToGoTo.top
+        }, {
+            duration: 1000,
+            queue: true,
+            start: function(){
+                $("#mobile_miniTile").css("visibility", "visible");
+            },
+            done: function () {
+
+                $("#mobile_miniTile").css("visibility", "hidden");
+
+                $("#mobile_miniTile").position({
+                    of: $("#mobile_playerInTurn"),
+                    my: "center",
+                    at: "center"
+                });
+            }
+        })
+    }
+
     function animateTilePlayedOnScreen(selectorForTile, listPosition)
     {
         if(!viewModel.isUserSmallScreen())
@@ -518,7 +552,7 @@
                             },
                             {
                                 duration: 1000,
-                                queue: false
+                                queue: true
                             })
                     } break;
 
@@ -532,7 +566,7 @@
                             },
                             {
                                 duration: 1000,
-                                queue: false
+                                queue: true
                             })
                     } break;
 
@@ -875,6 +909,8 @@
                 var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
                 var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
 
+                animateTinyTileToPlay("first");
+
                 $(selector_firstTile).position({
                     of: $(".mobile_playFirst"),
                     my: "center",
@@ -931,17 +967,48 @@
                     }
                     else
                     {
-                        viewModel.mobile_addTile(tile, "first");
+                        var positionToGoTo = null;
+                        switch (listPosition) {
+                            case "first": positionToGoTo = $(".mobile_playFirst").position(); break;
+                            case "last": positionToGoTo = $(".mobile_playLast").position(); break;
+                        }
 
-                        var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                        positionToGoTo.left = positionToGoTo.left + $(".mobile_playFirst").width() / 2;
+                        positionToGoTo.top = positionToGoTo.top + $(".mobile_playFirst").height() / 2 - $("#mobile_miniTile").height() / 2;
 
-                        $(selector_firstTile).position({
-                            of: $(".mobile_playFirst"),
-                            my: "center",
-                            at: "center"
-                        });
+                        $("#mobile_miniTile").animate({
+                            left: positionToGoTo.left,
+                            top: positionToGoTo.top
+                        }, {
+                            duration: 1000,
+                            queue: true,
+                            start: function () {
+                                $("#mobile_miniTile").css("visibility", "visible");
+                            },
+                            done: function () {
 
-                        animateTilePlayedOnScreen(selector_firstTile, "first");
+                                $("#mobile_miniTile").css("visibility", "hidden");
+
+                                $("#mobile_miniTile").position({
+                                    of: $("#mobile_playerInTurn"),
+                                    my: "center",
+                                    at: "center"
+                                });
+
+                                viewModel.mobile_addTile(tile, "first");
+
+                                var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+
+
+                                $(selector_firstTile).position({
+                                    of: $(".mobile_playFirst"),
+                                    my: "center",
+                                    at: "center"
+                                });
+
+                                animateTilePlayedOnScreen(selector_firstTile, "first");
+                            }
+                        })
                     }
 
                 } break;
@@ -976,6 +1043,8 @@
                         viewModel.mobile_addTile(tile, "last");
 
                         var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                        animateTinyTileToPlay("last");
 
                         $(selector_lastTile).position({
                             of: $(".mobile_playLast"),
@@ -1227,6 +1296,12 @@
         collision: "none"        
     });
 
+    $("#mobile_miniTile").position({
+        of: $("#mobile_playerInTurn"),
+        my: "center",
+        at: "center",
+        collision: "none"
+    })
 
     viewModel.setMessage("Game will begin when all players are ready...");
 
