@@ -234,16 +234,21 @@
 
     //selected tile result
     gameHub.client.iTookTile = function (tileId, success) {
-        if(success)
+        var tileSelector = "#selectTiles > div[data-tileid='" + tileId + "']";
+
+        if (success)
         {
-            $("div[data-tileid='" + tileId + "']").addClass("selected");
+            
+            $(tileSelector).addClass("selected");
             viewModel.addRoundTile(tileId);
+
+            
         }
         else
         {
             //TODO 3: animation for taken
             tilesInRoundClient--;
-            $("div[data-tileid='" + tileId + "']").addClass("otherSelected");
+            $(tileSelector).addClass("otherSelected");
         }
     };
 

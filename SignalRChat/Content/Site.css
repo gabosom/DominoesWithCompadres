@@ -413,6 +413,10 @@ input[type="checkbox"].input-validation-error {
             background-color:#191919;
         }
 
+    .mobile_playerList{
+        width:350px;
+    }
+
     /* Layout for mobile divs in game*/
 
     .gameInfoContainer
