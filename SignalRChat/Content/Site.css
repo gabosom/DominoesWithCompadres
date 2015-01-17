@@ -46,7 +46,29 @@ input[type="checkbox"].input-validation-error {
 
 
 /**** Game ****/
-/*TODO 9: .player:nth-child(odd) and .player:nth-child(even)  */
+
+#gameCodeShown, #mobile_playerInTurn
+{
+    text-align:center;
+}
+
+.gameInfoContainer {
+    margin: 10px 0px;
+}
+
+
+
+#playerContainer
+{
+    width:400px;
+    margin:auto;
+}
+
+    #playerContainer > table{
+        width:100%;
+    }
+
+
 
 .player{
 
@@ -62,6 +84,16 @@ input[type="checkbox"].input-validation-error {
 {
     font-weight:bold;
     color:#4cff00;
+}
+
+.player .pointsContainer{
+    border: 2px solid blue;
+    background: aliceblue;
+    padding: 3px;
+    border-radius: 5px;
+    width: 40px;
+    text-align: center;
+    color:black;
 }
 
 
@@ -283,6 +315,10 @@ input[type="checkbox"].input-validation-error {
 
 
 /***** ALL THE DEBUGGING STUFF GOES HERE ******/
+#toggleDebugConsoleContainer{
+    float:left;
+}
+
 #debugConsole
 {
     margin-top:90px;
@@ -317,6 +353,10 @@ input[type="checkbox"].input-validation-error {
 
 
 /*** Hide mobile stuff ***/
+.showIfMobile{
+    display:none;
+}
+
 .mobile_playabbleArea
 {
     display:none;
@@ -348,6 +388,10 @@ input[type="checkbox"].input-validation-error {
     {
         display:none;
     }
+
+    .showIfMobile{
+        display:block;
+    }
     
     .roundTileBoard{
         display:none;
@@ -360,11 +404,13 @@ input[type="checkbox"].input-validation-error {
     {
         width:100%;
         height:100%;
+        color:white;
     }
 
         .selectReadyContainer > .overlay > .overlayContent 
         {
-            height:50%;
+            height:100%;
+            background-color:#191919;
         }
 
     /* Layout for mobile divs in game*/
@@ -466,19 +512,6 @@ input[type="checkbox"].input-validation-error {
     {
         background:none;
         padding:5px;
-    }
-
-    /*#gameCodeShown
-    {
-        position:absolute;
-        left:10px;
-        bottom:5px;
-        z-index:99999;
-    }*/
-
-    #playerContainer
-    {
-        display:none;
     }
 
 

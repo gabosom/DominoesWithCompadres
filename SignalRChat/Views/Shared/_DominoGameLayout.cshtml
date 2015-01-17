@@ -44,7 +44,7 @@
                 @Html.ActionLink("Application name", "Index", "Home", null, new { @class = "navbar-brand" })
                 @if (DominoesWithCompadres.Utils.SiteSettings.DebugConsole)
                 {
-                    <span id="toggleDebugConsoleContainer"><a href="#" id="btnToggleDebugConsole">Show console</a></span>
+                    <div id="toggleDebugConsoleContainer"><a href="#" id="btnToggleDebugConsole">Show console</a></div>
                 }
             </div>
             <div class="navbar-collapse collapse">
@@ -54,6 +54,7 @@
                     <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
                 </ul>
             </div>
+            
         </div>
     </div>
     <div class="container body-content">

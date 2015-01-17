@@ -28,6 +28,7 @@
         self.myRoundTiles = ko.observableArray();
         self.playedTiles = ko.observableArray();
         self.playerInTurn = ko.observable();
+        self.playerInTurnDisplayName = ko.observable();
         self.mySelectedTile = ko.observable();
         self.firstPlayedTile = ko.observable();
         self.message = ko.observable();
@@ -35,7 +36,6 @@
         self.screenOrientation = ko.observable();
         self.mobile_lastPlayedTile = ko.observableArray();
         self.mobile_firstPlayedTile = ko.observableArray();
-        
 
         this.initializeViewModel = function (game) {
             this.gameCode(game.GameCode);
@@ -47,7 +47,6 @@
             }
 
             this.state(game.State);
-
         };
 
         self.setMessage = function (message) {
@@ -155,7 +154,8 @@
         };
 
         self.setPlayerInTurn = function (playerPositon) {
-            this.playerInTurn(playerPositon);
+            self.playerInTurn(playerPositon);
+            self.playerInTurnDisplayName(self.players()[playerPositon].DisplayName);
         };
 
         self.mobile_addTile = function (tile, listPosition)        {
@@ -195,7 +195,7 @@
     };
 
     gameHub.client.playerJoinedGame = function (player) {
-        WriteConsole("GameHub: Player joined game: " + player.displayName);
+        WriteConsole("GameHub: Player joined game: " + player.DisplayName);
         viewModel.addPlayer(player);
     };
 
