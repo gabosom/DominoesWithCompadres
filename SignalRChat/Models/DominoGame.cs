@@ -62,6 +62,18 @@ namespace DominoesWithCompadres.Models
                     });
                 }
             }
+
+            //shuffle #1
+            //for(int i = 0; i < this.AvailableTiles.Count; i++)
+            //{
+            //    int randomIndex = this._RandomNumberGenerator.Next(28 - i);
+            //    Tile shuffledTile = this.AvailableTiles[randomIndex];
+            //    this.AvailableTiles[randomIndex] = this.AvailableTiles[i];
+            //    this.AvailableTiles[i] = shuffledTile;
+            //}
+
+            //shuffle #2
+            this.AvailableTiles = this.AvailableTiles.OrderBy(tile => this._RandomNumberGenerator.Next()).ToList<Tile>();
         }
 
         public void StartRound()
@@ -108,6 +120,9 @@ namespace DominoesWithCompadres.Models
             if (this.Players.Count < 4)
             {
                 this.Players.Add(p);
+
+                if (this.Players.Count > 0)
+                    this.State = GameState.WaitingUsersReady;
                 return true;
             }
             else
@@ -141,13 +156,14 @@ namespace DominoesWithCompadres.Models
 
         public void PlayerReady(string ConnectionId)
         {
-            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created)
+            this.State = GameState.WaitingUsersReady;
+
+            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created || this.CurrentRound == null)
             {
-                this.State = GameState.WaitingUsersReady;
-                
                 //when restarting, need to remove previous tiles 
                 InitializeRound();
             }
+
 
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
@@ -246,6 +262,7 @@ namespace DominoesWithCompadres.Models
                     {
                         this.CurrentRound.PlayedTiles.AddLast(tilePlayed);
                     }break;
+                case "initial":
                 case "first":
                 default:
                     {
@@ -373,6 +390,11 @@ namespace DominoesWithCompadres.Models
             int numToReturn = this._IDsforTiles[this._RandomNumberGenerator.Next(this._IDsforTiles.Count)];
             this._IDsforTiles.Remove(numToReturn);
             return numToReturn;
+        }
+
+        internal void RemoveViewer(string userConnectionId)
+        {
+            this.Viewers.Remove(this.Viewers.SingleOrDefault(v => v.ConnectionID.Equals(userConnectionId)));
         }
     }
 

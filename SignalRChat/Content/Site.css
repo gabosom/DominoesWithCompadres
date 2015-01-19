@@ -46,7 +46,29 @@ input[type="checkbox"].input-validation-error {
 
 
 /**** Game ****/
-/*TODO 9: .player:nth-child(odd) and .player:nth-child(even)  */
+
+#gameCodeShown, #mobile_playerInTurn
+{
+    text-align:center;
+}
+
+.gameInfoContainer {
+    margin: 10px 0px;
+}
+
+
+
+#playerContainer
+{
+    width:400px;
+    margin:auto;
+}
+
+    #playerContainer > table{
+        width:100%;
+    }
+
+
 
 .player{
 
@@ -62,6 +84,16 @@ input[type="checkbox"].input-validation-error {
 {
     font-weight:bold;
     color:#4cff00;
+}
+
+.player .pointsContainer{
+    border: 2px solid blue;
+    background: aliceblue;
+    padding: 3px;
+    border-radius: 5px;
+    width: 40px;
+    text-align: center;
+    color:black;
 }
 
 
@@ -130,7 +162,7 @@ input[type="checkbox"].input-validation-error {
 
 }
 .passEnabled{
-
+    visibility:visible;
 }
 
 #selectTiles > .tile, .myTileContainer > .tile {
@@ -243,7 +275,7 @@ input[type="checkbox"].input-validation-error {
 }
 
 .roundTileBoard{
-    width:800px;
+    width: 100%;
     height: 400px;
     border: 1px solid pink;
 }
@@ -281,7 +313,50 @@ input[type="checkbox"].input-validation-error {
     display:none;
 }
 
+
+/***** ALL THE DEBUGGING STUFF GOES HERE ******/
+#toggleDebugConsoleContainer{
+    float:left;
+}
+
+#debugConsole
+{
+    margin-top:90px;
+    display:none;
+    background-color:black;
+    color: white;
+    line-height: 1.1em;
+    padding:10px;
+    overflow: scroll;
+    position:fixed;
+    left:0px;
+    top:0px;
+    width:100%;
+    height:100%;
+    z-index: 99999999;
+}
+
+
+.debug_playedTiles_table, .debug_playedTiles_table td
+{
+    border:1px solid white;
+}
+
+.debug_playedTiles_table td{
+    padding:5px;
+}
+
+
+
+
+/******** ALL THE STUFF FOR MOBILE STARTS HERE ***********/
+
+
 /*** Hide mobile stuff ***/
+.showIfMobile{
+    display:none;
+}
+
 .mobile_playabbleArea
 {
     display:none;
@@ -313,6 +388,10 @@ input[type="checkbox"].input-validation-error {
     {
         display:none;
     }
+
+    .showIfMobile{
+        display:block;
+    }
     
     .roundTileBoard{
         display:none;
@@ -325,24 +404,31 @@ input[type="checkbox"].input-validation-error {
     {
         width:100%;
         height:100%;
+        color:white;
     }
 
         .selectReadyContainer > .overlay > .overlayContent 
         {
-            height:50%;
+            height:100%;
+            background-color:#191919;
         }
+
+    .mobile_playerList{
+        width:350px;
+    }
 
     /* Layout for mobile divs in game*/
 
     .gameInfoContainer
     {
         width: 100%;
-        height:25%;
+        height:35%;
+        padding-top:10px;
     }
 
     #boardContainer{
         width:100%;
-        height:75%;
+        height:65%;
     }
 
         .mobile_playabbleArea
@@ -350,6 +436,10 @@ input[type="checkbox"].input-validation-error {
             height:80%;
             display:block;
             width:30%;
+            overflow:hidden;
+            border-radius: 4px;
+            -moz-border-radius: 4px;
+            -webkit-border-radius: 4px;
         }
 
         .mobile_playLast
@@ -361,12 +451,22 @@ input[type="checkbox"].input-validation-error {
         .mobile_playFirst
         {
             float:right;
-            border:1px solid blue;        
+            border:1px solid black;        
         }
 
         .gameInfo{
             float:left;
             width:40%;
+            padding:0px 10px;
+        }
+
+        #mobile_miniTile{
+            width: 20px;
+            height: 40px;
+            background-color:white;
+            border: 1px solid black;
+            position: absolute;
+            visibility:hidden;
         }
         
     .myTileAndMoveArea
@@ -427,14 +527,6 @@ input[type="checkbox"].input-validation-error {
         padding:5px;
     }
 
-    #gameCodeShown
-    {
-        position:absolute;
-        left:10px;
-        bottom:5px;
-        z-index:99999;
-    }
-
 
     /** different tiles need different sizes */
     .myTileContainer > .tile
@@ -463,5 +555,11 @@ input[type="checkbox"].input-validation-error {
         height:50%;
         background-size:90%;
         width:100%;
+    }
+
+
+    #debugConsole
+    {
+        margin-top:50px;
     }
 }

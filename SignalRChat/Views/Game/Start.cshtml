@@ -1,10 +1,14 @@
 ﻿@model DominoesWithCompadres.Models.DominoGame
 
+@{
+    Layout = "~/Views/Shared/_DominoGameLayout.cshtml";
+}
+
 <div id="resolutionTooSmall">
     Sorry, resolution is too small to play
 </div>
 <div id="gameContainer">
-    <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
+    
 
     <input type="hidden" id="gameCode" value="@Model.GameCode" />
     <input type="hidden" id="userType" value="@ViewBag.UserType" />
@@ -12,27 +16,55 @@
 
     <div class="gameInfoContainer">
         <div class="mobile_playabbleArea mobile_playLast" data-bind="foreach: mobile_lastPlayedTile">
-            <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+            <div class="playTile tile"  data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
                 <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                 <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
             </div>
         </div>
         <div class="gameInfo">
-            <div id="playerContiner">
-                <div data-bind="foreach: players" class="playerList left">
-                    <div class="player" data-bind="if: $index() % 2 ==0">
-                        <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span> : <span data-bind="text: points"></span>
-                    </div>
-                </div>
-                <div data-bind="foreach: players" class="playerList right">
-                    <div class="player" data-bind="if: $index() % 2 ==1">
-                        <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span> : <span data-bind="text: points"></span>
-                    </div>
-                </div>
+            <div id="gameCodeShown">GameCode: <span data-bind="text: gameCode"></span></div>
+            <div id="mobile_playerInTurn" class="showIfMobile">
+                In turn: <span data-bind="text: playerInTurnDisplayName"></span>
+                <div id="mobile_miniTile"></div>
+            </div>
+            <div id="playerContainer" class="hideIfMobile">
+                <table>
+                    <tr>
+                        <td>
+                            <table data-bind="foreach: players" class="playerList left">
+                                <tr class="player" data-bind="if: $index() % 2 ==0">
+                                    <td>
+                                        <div class="pointsContainer">
+                                            <span data-bind="text: points"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+
+                        <td>
+                            <table data-bind="foreach: players" class="playerList right">
+                                <tr class="player" data-bind="if: $index() % 2 ==1">
+                                    <td>
+                                        <div class="pointsContainer">
+                                            <span data-bind="text: points"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
         <div class="mobile_playabbleArea mobile_playFirst" data-bind="foreach: mobile_firstPlayedTile">
-            <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+            <div class="playTile tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
                 <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                 <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
             </div>
@@ -61,7 +93,7 @@
 
             <div class="myTileAndMoveArea">
                 <div class="myTileContainer" data-bind="foreach: myRoundTiles">
-                    <div class="tile" data-bind="attr: {'data-tileId' : id}, click: $parent.selectMyTile, css: $parent.getTilesDropClasses($data)">
+                    <div class="playTile tile" data-bind="attr: {'data-tileId' : id}, click: $parent.selectMyTile, css: $parent.getTilesDropClasses($data)">
                         <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                         <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
                     </div>
@@ -81,7 +113,7 @@
             
 
             <div class="roundTileBoard" data-bind="foreach: playedTiles">
-                <div class="tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
+                <div class="playTile tile" data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">
                     <div class="tileHalf" data-bind="attr:{'data-value' : value1}, css: $parent.getWordNumbersFromValue($data.value1)"></div>
                     <div class="tileHalf" data-bind="attr:{'data-value' : value2}, css: $parent.getWordNumbersFromValue($data.value2)"></div>
                 </div>
@@ -94,6 +126,22 @@
                     <div data-bind="text: message"></div>
                     <input id="btnRoundReady" type="button" value="Ready" />
                     <div class="readyInfoHidden">Waiting on other users... Please wait...</div>
+
+                    <div class="mobile_playerList">
+                        <!-- Players table for mobile -->
+                        <table data-bind="foreach: players" class="playerList showIfMobile">
+                            <tr class="player">
+                                <td>
+                                    <div class="pointsContainer">
+                                        <span data-bind="text: points"></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span data-bind="text: DisplayName, css: { active: $index() == $parent.playerInTurn() }"></span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

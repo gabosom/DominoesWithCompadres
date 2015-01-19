@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
@@ -31,6 +32,7 @@ namespace DominoesWithCompadres.Models.ViewModel
         private string _GameCode;
         [Required]
         [StringLength(15, MinimumLength = 1)]
+        [DisplayName("Name")]
         public string UserDisplayName { get; set; }
         [Required]
         [StringLength(4)]
@@ -53,6 +55,7 @@ namespace DominoesWithCompadres.Models.ViewModel
     {
         [Required]
         [StringLength(15, MinimumLength = 1)]
+        [DisplayName("Name")]
         public string Create_UserDisplayName { get; set; }
         [Required]
         public UserType UserType { get; set; }
