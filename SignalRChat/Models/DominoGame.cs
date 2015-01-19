@@ -246,45 +246,83 @@ namespace DominoesWithCompadres.Models
 
             //TODO 23: null expception
             //get tile to be played
-            Tile tilePlayed = curPlayer.Tiles.Single(t => t.ID == tile.ID);
+            Tile tilePlayed;
+            
+            try{
+                tilePlayed = curPlayer.Tiles.Single(t => t.ID == tile.ID);
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Player doesn't have tile.");
+            }
+            
             tilePlayed.Value1 = tile.Value1;
             tilePlayed.Value2 = tile.Value2;
 
-            //TODO 24: make sure that the value we get from the client is updated here, the client can rotate the tiles if needed
 
-            //remove tile from user's active tile
-            curPlayer.Tiles.Remove(tilePlayed);
-
-            //add it to Played Tiles
+            //validate play is correct
+            bool isPlayCorrect = false;
             switch(listPosition)
             {
+                case "initial":
+                    {
+                        if (this.CurrentRound.PlayedTiles.Count == 0)
+                            isPlayCorrect = true;
+                    }break;
                 case "last":
                     {
-                        this.CurrentRound.PlayedTiles.AddLast(tilePlayed);
+                        if (this.CurrentRound.PlayedTiles.ElementAt(this.CurrentRound.PlayedTiles.Count-1).Value2 == tilePlayed.Value1)
+                            isPlayCorrect = true;
                     }break;
-                case "initial":
                 case "first":
-                default:
                     {
-                        this.CurrentRound.PlayedTiles.AddFirst(tilePlayed);
+                        if (this.CurrentRound.PlayedTiles.ElementAt(0).Value1 == tilePlayed.Value2)
+                            isPlayCorrect = true;
                     }break;
+            }
+
+            if (isPlayCorrect)
+            {
+
+
+                //remove tile from user's active tile
+                curPlayer.Tiles.Remove(tilePlayed);
+
+                //add it to Played Tiles
+                switch (listPosition)
+                {
+                    case "last":
+                        {
+                            this.CurrentRound.PlayedTiles.AddLast(tilePlayed);
+                        } break;
+                    case "initial":
+                    case "first":
+                    default:
+                        {
+                            this.CurrentRound.PlayedTiles.AddFirst(tilePlayed);
+                        } break;
                 }
 
 
-            //set next player
-            if(curPlayer.Tiles.Count > 0)
-            {
-                this.PlayerNextTurn();
-                this.CurrentRound.PlayersThatPassed.Clear();
+                //set next player
+                if (curPlayer.Tiles.Count > 0)
+                {
+                    this.PlayerNextTurn();
+                    this.CurrentRound.PlayersThatPassed.Clear();
+                }
+                else
+                {
+                    this.RoundFinished(curPlayer);
+                    //TODO 25: game finished, not just round
+                    //this.State = GameState.RoundFinished;
+                }
+
+                return true;
             }
             else
             {
-                this.RoundFinished(curPlayer);
-                //TODO 25: game finished, not just round
-                //this.State = GameState.RoundFinished;
+                return false;
             }
-
-            return true;
         }
 
         private void RoundFinished(Player winner)

@@ -109,7 +109,7 @@ namespace DominoesWithCompadres.Hubs
                     }
                     else
                     {
-                        //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
+                        Clients.Caller.error(new Exception("Tile played is no good"));
                     }
                 }
                 else
