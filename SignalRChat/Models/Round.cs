@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using DominoesWithCompadres.Models.ViewModel;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace DominoesWithCompadres.Models
         [JsonProperty("playerInTurn")]
         public int PlayerInTurn { get; set; }
         public List<string> PlayersThatPassed { get; set; }
+        public RoundResults Results { get; set; }
 
         public Round()
         {

@@ -7,26 +7,53 @@
 
 @using (Html.BeginForm("Join", "Game", FormMethod.Post))
 {
-    @Html.LabelFor(model => model.GameCode)
-    @Html.TextBoxFor(model => model.GameCode)
-    @Html.ValidationMessageFor(model => model.GameCode, "*")
-    <br />
-    @Html.TextBoxFor(model => model.UserDisplayName)
-    <br />
-    bool first = true;
-    foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
-    {
-        @Html.Label(value)
-        if (first)
-        {
-            @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
-            first = false;
-        }
-        else
-        {
-            @Html.RadioButtonFor(model => model.UserType, value)
-        }
-    }
-    <br />
-    <input type="submit" value="Create" />
+    <table>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.GameCode)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.GameCode)
+                @Html.ValidationMessageFor(model => model.GameCode, "*")
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(model => model.UserDisplayName)
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.UserDisplayName)
+            </td>
+        </tr>
+        <tr class="hideIfMobile">
+            <td>Join As</td>
+            <td>
+                @{bool first = true;}
+                @foreach (string value in Enum.GetNames(typeof(DominoesWithCompadres.Models.ViewModel.UserType)))
+                {
+                    <div>
+                        @Html.Label(value)
+                        @if (first)
+                        {
+                            @Html.RadioButtonFor(model => model.UserType, value, new Dictionary<string, object>() { { "checked", "checked" } })
+                            first = false;
+                        }
+                        else
+                        {
+                            @Html.RadioButtonFor(model => model.UserType, value)
+                        }
+
+                    </div>
+                }
+
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <input type="submit" value="Create" />
+            </td>
+        </tr>
+
+    </table>
 }

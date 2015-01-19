@@ -1,9 +1,11 @@
-﻿using DominoesWithCompadres.Models;
+﻿using DominoesWithCompadres.Hubs;
+using DominoesWithCompadres.Models;
 using DominoesWithCompadres.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace DominoesWithCompadres.Utils
@@ -29,6 +31,74 @@ namespace DominoesWithCompadres.Utils
             GameService.CurrentGames.Add(NewGame);
 
             return NewGame;
+        }
+
+        public static bool PlayerJoined(string gameCode, string displayName, string userConnectionId, GameHub gameHub)
+        {
+            try
+            {
+                //add user to Game
+                DominoGame game = GameService.Get(gameCode);
+
+                Player newPlayer = new Player()
+                {
+                    ConnectionID = userConnectionId,
+                    DisplayName = displayName,
+                    ID = GameService.GeneratePlayerId()
+                };
+
+                bool couldAddPlayer = game.AddPlayer(newPlayer);
+                if (couldAddPlayer)
+                {
+                    gameHub.Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                    gameHub.Groups.Add(newPlayer.ConnectionID, gameCode);
+
+                    //TODO-later: blog about this needed this for sync issues while setting up the game
+                    Thread.Sleep(500);     
+                    gameHub.Clients.Caller.setupGame(game);       
+                    return true;
+                }
+                else
+                {
+                    //TODO: what do we show when player couldn't join game
+                    gameHub.Clients.Group(gameCode).error(new Exception("Game is full"));
+                    return false;
+                }
+
+            }
+            catch(Exception e)
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+                return false;
+            }
+        }
+
+        public static void ViewerJoined(string gameCode, string userConnectionId, GameHub gameHub)
+        {
+            try
+            {
+                //add user to Game
+                DominoGame game = GameService.Get(gameCode);
+
+                Viewer newViewer = new Viewer()
+                {
+                    ConnectionID = userConnectionId,
+                    ID = GameService.GeneratePlayerId()
+                };
+
+                game.AddViewer(newViewer);
+                gameHub.Groups.Add(newViewer.ConnectionID, gameCode);
+
+                //needed this for sync issues while setting up the game
+                Thread.Sleep(500);     
+                gameHub.Clients.Caller.setupGame(game);       
+                
+                
+            }
+            catch (Exception e)
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+            }
         }
 
         private static string GenerateGameID()
@@ -79,54 +149,7 @@ namespace DominoesWithCompadres.Utils
 
         public static RoundResults GetRoundResults(DominoGame game)
         {
-            RoundResults results = new RoundResults();
-            StringBuilder messageBuilder = new StringBuilder();
-
-            messageBuilder.Append("Winner: ");
-            
-            //Make this more efficient
-            //get player with 0 tiles
-            Player winningPlayer = game.Players.Single<Player>(p => p.Tiles.Count == 0);
-            
-            messageBuilder.Append(winningPlayer.DisplayName);
-            
-
-            //if it's a team game, then add team mate
-            if(game.Players.Count == 4)
-            {
-                Player otherWinner = game.Players[(game.Players.IndexOf(winningPlayer) + 2) % 4]; 
-                results.Winners.Add(otherWinner);
-                messageBuilder.Append(" ").Append(otherWinner.DisplayName);
-            }
-
-
-            //calculate winning points
-            List<Player> losers = game.Players.Where<Player>(p => !results.Winners.Contains(p)).ToList<Player>();
-            int totalPoints = 0;
-
-            foreach(Player p in losers)
-            {
-                foreach(Tile t in p.Tiles)
-                {
-                    totalPoints += t.Value1;
-                    totalPoints += t.Value2;
-                }
-            }
-            winningPlayer.Points += totalPoints;
-            results.Winners.Add(winningPlayer);
-
-
-            //TODO 39: better message
-            messageBuilder.Append(" won " + totalPoints + ".");
-
-
-            //TODO 40: remove this until I use knockoutJS mapping for these things
-            results.Winners.Clear();
-            results.Winners = game.Players;
-
-
-            results.Message = messageBuilder.ToString();
-            return results;
+            return game.CurrentRound.Results;
         }
 
         public static List<string> GetViewersConnectionIds(string gameCode)
@@ -142,6 +165,77 @@ namespace DominoesWithCompadres.Utils
             }
 
             return connections;
+        }
+
+        internal static void UserTakesTile(string playerConnectionId, string gameCode, Hubs.GameHub gameHub)
+        {
+            //find game and player
+            //TODO: try/catch
+            DominoGame game = GameService.Get(gameCode);
+
+            if(game.Players[game.PlayerInTurn()].ConnectionID.Equals(playerConnectionId))
+            {
+                Tile t = game.UserTakesTile(game.GetPlayer(playerConnectionId));
+
+                if(t != null)
+                {
+                    //alert client of the new tile
+                    gameHub.Clients.Group(gameCode).addTakenTile(t, playerConnectionId);
+
+                    //alert everyone of the new user
+                    gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                }
+                else
+                {
+                    //TODO: there are no tiles left or couldn't get tile
+                }
+            }
+            else
+            {
+                //TODO: user is not in turn, what to do here
+            }
+        }
+
+
+        public static void SendExceptionToClients(Exception e, string gameCode, GameHub gameHub)
+        {
+            try
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+            }
+            catch
+            {
+                //log at some point
+            }
+        }
+
+
+        /** Deal with user connections **/
+
+        public static void UserDisconnected(string gameCode, string userConnectionId, GameHub gamehub)
+        {
+            try
+            {
+                DominoGame game = GameService.Get(gameCode);
+
+                Player p = game.GetPlayer(userConnectionId);
+
+                //if a player was disconnected, need to notify. if its a viewer, who cares
+                if(p != null)
+                {
+                    p.State = UserState.Disconnected;
+                }
+                else
+                {
+                    game.RemoveViewer(userConnectionId);
+                }
+
+                gamehub.Clients.Group(gameCode).error(new Exception(p.DisplayName + " was disconnected."));
+            }
+            catch(Exception e)
+            {
+                SendExceptionToClients(e, gameCode, gamehub);
+            }
         }
     }
 }

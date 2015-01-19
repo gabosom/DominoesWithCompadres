@@ -11,17 +11,9 @@
     var list_firstDirectionIndex = 0;
     var list_lastDirectionMovement = ["down", "left", "up", "left"];
     var list_lastDirectionIndex = 0;
-    
+    var droppableTargetAnimationTimer = null;    
 
     var debug = true;
-
-    function WriteConsole(message)
-    {
-        if(debug == true)
-        {
-            console.log(message)
-        }
-    }
 
 
     function ViewModel() {
@@ -36,6 +28,7 @@
         self.myRoundTiles = ko.observableArray();
         self.playedTiles = ko.observableArray();
         self.playerInTurn = ko.observable();
+        self.playerInTurnDisplayName = ko.observable();
         self.mySelectedTile = ko.observable();
         self.firstPlayedTile = ko.observable();
         self.message = ko.observable();
@@ -43,7 +36,6 @@
         self.screenOrientation = ko.observable();
         self.mobile_lastPlayedTile = ko.observableArray();
         self.mobile_firstPlayedTile = ko.observableArray();
-        
 
         this.initializeViewModel = function (game) {
             this.gameCode(game.GameCode);
@@ -55,7 +47,6 @@
             }
 
             this.state(game.State);
-
         };
 
         self.setMessage = function (message) {
@@ -92,6 +83,10 @@
             this.myRoundTiles.push(this.getTile(tileId));
         };
 
+        this.addRoundTileWithTile = function (tile) {
+            this.myRoundTiles.push(tile);
+        };
+
         this.getTile = function (tileId) {
             for(i = 0; i < this.availableTiles().length; i++)
             {
@@ -103,9 +98,8 @@
 
         self.initializeRound = function(round){
             self.setPlayerInTurn(round.playerInTurn);
-
-            //TODO 1: need a way to clean up the old values before just assigning empty
             self.playedTiles.removeAll();
+            self.myRoundTiles.removeAll();
         };
 
         self.selectMyTile = function (selectedTile, event) {
@@ -113,6 +107,11 @@
             {
                 if (userInTurn)
                 {
+
+                    //finish any animations going
+                    finishAllAnimations();
+
+
                     $(".myTileContainer > .tile").removeClass("selected");
                 
                     self.mySelectedTile(selectedTile);
@@ -155,7 +154,8 @@
         };
 
         self.setPlayerInTurn = function (playerPositon) {
-            this.playerInTurn(playerPositon);
+            self.playerInTurn(playerPositon);
+            self.playerInTurnDisplayName(self.players()[playerPositon].DisplayName);
         };
 
         self.mobile_addTile = function (tile, listPosition)        {
@@ -163,15 +163,21 @@
             {
                 case "first":
                     {
-                        self.mobile_firstPlayedTile.removeAll();
+                        if (self.mobile_firstPlayedTile.length == 3)
+                            self.mobile_firstPlayedTile.shift();
                         self.mobile_firstPlayedTile.push(tile);
                     }; break;
 
                 case "last":
                     {
-                        self.mobile_lastPlayedTile.removeAll();
+                        if (self.mobile_lastPlayedTile.length == 3)
+                            self.mobile_lastPlayedTile.shift();
                         self.mobile_lastPlayedTile.push(tile);
-                    }break;
+                    } break;
+                case "initial": {
+                    self.mobile_addTile(tile, "first");
+                    self.mobile_addTile(tile, "last");
+                } break;
             }
         };
     };
@@ -186,11 +192,19 @@
     ******************/
     var gameHub = $.connection.gameHub;
 
+    gameHub.client.error = function(errorObject)
+    {
+        var toShow = errorObject.Code + ": " + errorObject.Message;
+        alert(toShow);
+    };
+
     gameHub.client.playerJoinedGame = function (player) {
+        WriteConsole("GameHub: Player joined game: " + player.DisplayName);
         viewModel.addPlayer(player);
     };
 
     gameHub.client.setupGame = function (game) {
+        WriteConsole("GameHub: Setting up game...");
         viewModel.initializeViewModel(game);
         changeGameState(game.State);
     };
@@ -199,8 +213,23 @@
         viewModel.setAvailableTiles(tiles);
     };
 
+    gameHub.client.removeAvailableTiles = function (howMany) {
+        //removes available tiles so it has the count, they don't represent the actual available tiles left.
+        for (i = 0; i < howMany; i++)
+            viewModel.availableTiles.pop();
+    };
+
     gameHub.client.updateGameState = function (state) {
         changeGameState(state);
+    };
+
+    gameHub.client.addTakenTile = function (tile, playerId) {
+        //TODO: make animation for taken tile
+
+        if (gameHub.connection.id == playerId)
+            viewModel.addRoundTileWithTile(tile);
+        
+        viewModel.availableTiles.pop();
     };
 
     gameHub.client.otherUserTookTile = function (tileId) {
@@ -209,16 +238,21 @@
 
     //selected tile result
     gameHub.client.iTookTile = function (tileId, success) {
-        if(success)
+        var tileSelector = "#selectTiles > div[data-tileid='" + tileId + "']";
+
+        if (success)
         {
-            $("div[data-tileid='" + tileId + "']").addClass("selected");
+            
+            $(tileSelector).addClass("selected");
             viewModel.addRoundTile(tileId);
+
+            
         }
         else
         {
             //TODO 3: animation for taken
             tilesInRoundClient--;
-            $("div[data-tileid='" + tileId + "']").addClass("otherSelected");
+            $(tileSelector).addClass("otherSelected");
         }
     };
 
@@ -231,24 +265,22 @@
     gameHub.client.initializeRound = function (currentRound) {
         viewModel.initializeRound(currentRound);
         initializeRound();
-
-        //TODO 5: viewModel changes to current player should trigger update user, for now, forcing manually
-        updatePlayerInTurn(viewModel.playerInTurn());
     };
 
     gameHub.client.userPlayedTile = function (tile, nextPlayerInTurn, listPosition) {
+        WriteConsole("Gamehub: User Played Tile");
         playTileOnBoard(tile, listPosition);
 
         updatePlayerInTurn(nextPlayerInTurn);
     };
 
-    gameHub.client.roundFinished = function (roundResults) {
+    gameHub.client.roundFinished = function (roundResults, players) {
 
         WriteConsole("Round over");
         WriteConsole(JSON.stringify(roundResults));
         //TODO: need to use knockout mapping to fix this better, for now, I will just send all the players and update the array
         //gamehub service should only inclue the winners in the round results
-        viewModel.updatePlayers(roundResults.winners);
+        viewModel.updatePlayers(players);
 
         //set all the data in the view model
         viewModel.setMessage(roundResults.message);
@@ -257,10 +289,14 @@
     };
 
 
+    /*** Connection issues ****/
+    
     
 
     // Start the connection.
     $.connection.hub.start().done(function () {
+
+        gameHub.state.gameCode = gameCode;
 
         //make user join game
         gameHub.server.joinGame(displayName, gameCode, userType);
@@ -290,7 +326,6 @@
         {
             WriteConsole("It's MY turn");
             //need to generate possible options for plays
-            Debug_OutputArray(viewModel.playedTiles(), "Played tiles array");
             
             generateDroppableZonesForPlays();
 
@@ -318,7 +353,15 @@
 
                 if(!canMakeMove)
                 {
-                    $(".btnPassTurn").css("visibility", "visible");
+                    if (viewModel.availableTiles().length > 0)
+                    {
+                        $("#takeTileContainer").addClass("takeEnabled");
+                    }
+                    else
+                    {
+                        noMorePlaysAction("pass");
+                        $(".btnPassTurn").addClass("passEnabled");
+                    }
                 }
 
             }
@@ -345,14 +388,14 @@
 
     function generateDroppableZonesForPlays() {
 
-
+        WriteConsole("Generate Droppable Zones");
         if (!viewModel.isUserSmallScreen())
         {        
             //if the board is empty
             if (viewModel.playedTiles().length == 0) {
             
                 //generate tile droppable zone and add it
-                var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "first")
+                var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "initial")
 
                 $(".roundTileBoard").append(dropTarget);
 
@@ -374,6 +417,8 @@
                 var firstOpenValue = getOpenValue("first");
                 var lastOpenValue = getOpenValue("last");
 
+                WriteConsole("Open values= first: " + firstOpenValue + ", last: " + lastOpenValue);
+
                 var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
                 var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
 
@@ -392,12 +437,12 @@
             //if the board is empty
             if(viewModel.playedTiles().length == 0)
             {
-                var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
-                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "first");
+                var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
+                var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
 
                 //add left and add right, they both work
-                $(".mobile_playLast").append(firstDropTarget);
-                $(".mobile_playFirst").append(lastDropTarget);
+                $(".mobile_playFirst").append(firstDropTarget);
+                $(".mobile_playLast").append(lastDropTarget);
 
                 $(firstDropTarget).position({
                     of: $(".mobile_playFirst"),
@@ -413,22 +458,147 @@
             }
             else
             {
-                var firstOpenTile = viewModel.mobile_firstPlayedTile()[0];
-                var lastOpenTile = viewModel.mobile_lastPlayedTile()[0];
+                if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
+                {
+                    //if something is being animated, just wait
+                    if ($(".mobile_playabbleArea > .tile").add("#mobile_miniTile").filter(":animated").length > 0)
+                    {
+                        WriteConsole("Generating droppable is paused, animation was happening");
 
-                var firstDropTarget = createDroppableTarget(firstOpenTile.value1, "first");
-                var lastDropTarget = createDroppableTarget(lastOpenTile.value2, "last");
+                        //TODO: could make the callback another function so when it calls back, it saves the first comparison again
+                        droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 1000);
+                    }
+                    else
+                    {
+                        droppableTargetAnimationTimer = null;
+                        WriteConsole("Generating droppable is happening");
+                        var firstTile = viewModel.playedTiles()[0];
+                        var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-                //add left and add right, they both work
-                $(".mobile_playFirst").append(firstDropTarget);
-                $(".mobile_playLast").append(lastDropTarget);
+                        var firstDropTarget = createDroppableTarget(firstTile.value1, "first");
+                        var lastDropTarget = createDroppableTarget(lastTile.value2, "last");
 
-                positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstOpenTile.id + "']", "first");
-                positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastOpenTile.id + "']", "last");
+                        WriteConsole("Open values= first: " + firstTile.value1 + ", last: " + lastTile.value2);
+
+                        //add left and add right, they both work
+                        $(".mobile_playFirst").append(firstDropTarget);
+                        $(".mobile_playLast").append(lastDropTarget);
+
+                        positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstTile.id + "']", "first");
+                        positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastTile.id + "']", "last");
+                    }
+                }
             }
         }
     }
 
+    function finishAllAnimations()
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+
+        }
+        else
+        {
+            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(true, true);
+        }
+    }
+
+    function animateTinyTileToPlay(listPosition) {
+
+        var positionToGoTo = null;
+        switch(listPosition)
+        {
+            case "first": positionToGoTo = $(".mobile_playFirst").position(); break;
+            case "last": positionToGoTo = $(".mobile_playLast").position(); break;
+        }
+
+        positionToGoTo.left = positionToGoTo.left + $(".mobile_playFirst").width() / 2;
+        positionToGoTo.top = positionToGoTo.top + $(".mobile_playFirst").height() / 2 - $("#mobile_miniTile").height()/2;
+
+        $("#mobile_miniTile").animate({
+            left: positionToGoTo.left,
+            top: positionToGoTo.top
+        }, {
+            duration: 1000,
+            queue: true,
+            start: function(){
+                $("#mobile_miniTile").css("visibility", "visible");
+            },
+            done: function () {
+
+                $("#mobile_miniTile").css("visibility", "hidden");
+
+                $("#mobile_miniTile").position({
+                    of: $("#mobile_playerInTurn"),
+                    my: "center",
+                    at: "center"
+                });
+            }
+        })
+    }
+
+    function animateTilePlayedOnScreen(selectorForTile, listPosition)
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+        }
+        else
+        {
+            switch(listPosition)
+            {
+                case "first":
+                    {
+                        var movementForFirst = "-=" + $(selectorForTile).width() + "px";
+                        $(".mobile_playFirst > .playTile").animate(
+                            {
+                               left: movementForFirst
+                            },
+                            {
+                                duration: 1000,
+                                queue: true
+                            })
+                    } break;
+
+                case "last":
+                    {
+                        var movementForLast = "+=" + $(selectorForTile).width() + "px";
+
+                        $(".mobile_playLast > .playTile").animate(
+                            {
+                                left: movementForLast
+                            },
+                            {
+                                duration: 1000,
+                                queue: true
+                            })
+                    } break;
+
+                case "initial":
+                    {
+                        var movementForFirst = "-=" + $(selectorForTile).width() + "px";
+                        var movementForLast = "+=" + $(selectorForTile).width() + "px";
+                        $(".mobile_playFirst > .playTile").animate(
+                            {
+                                left: movementForFirst
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+
+                        $(".mobile_playLast > .playTile").animate(
+                            {
+                                left: movementForLast
+                            },
+                            {
+                                duration: 1000,
+                                queue: false
+                            })
+                    } break;
+            }
+        }
+    }
 
     function getOpenValue(listPosition)
     {
@@ -523,8 +693,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center bottom",
-                                    at: "center top",
+                                    my: "right bottom",
+                                    at: "right top",
                                     collision: "none"
                                 });
                             } break;
@@ -570,7 +740,7 @@
                     }
                 }
 
-                else
+                else if(listPosition == "last")
                 {
                     switch (list_lastDirectionIndex)
                     {
@@ -580,8 +750,8 @@
 
                                 $(selector).position({
                                     of: $(anchorSelector),
-                                    my: "center top",
-                                    at: "center bottom",
+                                    my: "left top",
+                                    at: "left bottom",
                                     collision: "none"
                                 });
                             } break;
@@ -623,7 +793,17 @@
                             } break;
                     }
                 }
+                else if (listPosition == "initial")
+                {
+                    $(selector).addClass("firstTilePlayed");
 
+                    //put it in the middle
+                    $(selector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+                }
         
                 var containerOffset = $(allTileContainer).offset();
                 var containerPosition = $(allTileContainer).position();
@@ -649,12 +829,17 @@
                     //turns up, right, down, right
                     if(listPosition == "first")
                     {
+                        if (list_firstDirectionIndex == 2)
+                            invertTileValueDivs(selector)
                         list_firstDirectionIndex = ++list_firstDirectionIndex%4;
                     }
 
                         //turns down left up left
                     else
                     {
+                        if (list_lastDirectionIndex == 2)
+                            invertTileValueDivs(selector)
+
                         list_lastDirectionIndex = ++list_lastDirectionIndex % 4;
                     }
                 }
@@ -704,9 +889,163 @@
         $(selector).children("div:first").remove();
     }
     
+    function switchTileHalves(tile)
+    {
+        var tempValue = tile.value1;
+        tile.value1 = tile.value2;
+        tile.value2 = tempValue;
+
+        return tile;
+    }
+
+    function playTileOnBoard(tile, listPosition)
+    {
+        //fixes the tiles value if needed
+        switch(listPosition)
+        {
+            case "first":{
+                //check if the values that connect go together, if not, make sure they are
+                var firstOpenValue = getOpenValue(listPosition);
+
+                //shift viewModel when appropriate
+                if(firstOpenValue != tile.value2){
+                    WriteConsole("Need to invert tile values");
+                    tile = switchTileHalves(tile);                    
+                }
+
+                //added new tile
+                viewModel.playedTiles.unshift(tile);
+
+            } break;
+
+            case "last": {
+
+                //check if the values that connect go together, if not, make sure they are
+                var lastOpenValue = getOpenValue(listPosition);
+
+                //shift viewModel when appropriate
+                if (lastOpenValue != tile.value1){
+                    WriteConsole("Need to invert tile values");
+                    tile = switchTileHalves(tile);
+                }
+
+                //added new tile at the end
+                viewModel.playedTiles.push(tile);
+
+            } break;
+
+            case "initial": {
+                viewModel.playedTiles.push(tile);
+            }
+        }
+
+
+
+        /************* NOW OFF TO FIGURING OUT WHERE TO PLACE THE PLAYED TILE***************/
+
+        //finish all animations
+        finishAllAnimations();
+
+        //if the user is in a big screen
+        if(!viewModel.isUserSmallScreen())
+        {
+            var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
+
+            switch (listPosition) {
+                case "first": {
+                    var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+
+                    if (list_firstDirectionIndex % 2 == 1)
+                        list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
+                } break;
+
+                case "last": {
+                    var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length-2].id + "']";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+
+                    if (list_lastDirectionIndex % 2 == 1)
+                        list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
+                } break;
+
+                case "initial": {
+                    var anchorSelector = ".roundTileBoard";
+
+                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                }
+            }
+        }
+        else {
+
+            viewModel.mobile_addTile(tile, listPosition);
+            var tileSelector = "";
+            var anchorSelector = "";
+
+            switch (listPosition) {
+                case "first": {                    
+                    tileSelector = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                    anchorSelector = ".mobile_playFirst";
+
+                    //put tile on board and animate
+                    $(tileSelector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
+                } break;
+
+                case "last": {                    
+                    tileSelector = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+                    anchorSelector = ".mobile_playLast";
+
+                    //put tile on board and animate
+                    $(tileSelector).position({
+                        of: $(anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
+                } break;
+
+                case "initial": {
+                    f_tileSelector = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                    l_tileSelector = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                    f_anchorSelector = ".mobile_playFirst";
+                    l_anchorSelector = ".mobile_playLast";
+
+                    //put tile on board and animate
+                    $(f_tileSelector).position({
+                        of: $(f_anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    //put tile on board and animate
+                    $(l_tileSelector).position({
+                        of: $(l_anchorSelector),
+                        my: "center",
+                        at: "center"
+                    });
+
+                    animateTilePlayedOnScreen(f_tileSelector, "first");
+                    animateTilePlayedOnScreen(l_tileSelector, "last");
+                }
+            }
+
+            
+        }
+
+        return tile;
+    }
 
     //tile is a tile object, listPosition is either "first" or "last"
-    function playTileOnBoard(tile, listPosition)
+    function playTileOnBoardOld(tile, listPosition)
     {
         //TODO 31: need to figure out what happens when joining mid game
         //when it's the first, need to anchor it to the middle
@@ -720,10 +1059,11 @@
 
             if(!viewModel.isUserSmallScreen())
             {
-                $(".roundTileBoard > .tile[data-tileid='" + tile.id + "']").addClass("firstTilePlayed");
+                var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
+                $(tileSelector).addClass("firstTilePlayed");
 
                 //put it in the middle
-                $(".firstTilePlayed").position({
+                $(tileSelector).position({
                     of: $(".roundTileBoard"),
                     my: "center",
                     at: "center"
@@ -734,22 +1074,35 @@
                 viewModel.mobile_addTile(tile, "first");
                 viewModel.mobile_addTile(tile, "last");
 
-                $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
+
+                var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+                var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                animateTinyTileToPlay("first");
+
+                $(selector_firstTile).position({
                     of: $(".mobile_playFirst"),
-                    my: "left",
-                    at: "left"
+                    my: "center",
+                    at: "center"
                 });
 
-                $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                
+
+                $(selector_lastTile).position({
                     of: $(".mobile_playLast"),
-                    my: "right",
-                    at: "right"
+                    my: "center",
+                    at: "center"
                 });
+
+                animateTilePlayedOnScreen(selector_firstTile, "initial");
             }
         }
 
         else
         {
+            //finish all animations
+            finishAllAnimations();
+
             //if first in the list, then shift. if end of list, then push
             switch (listPosition) {
                 case "first": {
@@ -783,13 +1136,48 @@
                     }
                     else
                     {
-                        viewModel.mobile_addTile(tile, "first");
+                        var positionToGoTo = null;
+                        switch (listPosition) {
+                            case "first": positionToGoTo = $(".mobile_playFirst").position(); break;
+                            case "last": positionToGoTo = $(".mobile_playLast").position(); break;
+                        }
 
-                        $(".mobile_playFirst > .tile[data-tileid='" + tile.id + "']").position({
-                            of: $(".mobile_playFirst"),
-                            my: "left",
-                            at: "left"
-                        });
+                        positionToGoTo.left = positionToGoTo.left + $(".mobile_playFirst").width() / 2;
+                        positionToGoTo.top = positionToGoTo.top + $(".mobile_playFirst").height() / 2 - $("#mobile_miniTile").height() / 2;
+
+                        $("#mobile_miniTile").animate({
+                            left: positionToGoTo.left,
+                            top: positionToGoTo.top
+                        }, {
+                            duration: 1000,
+                            queue: true,
+                            start: function () {
+                                $("#mobile_miniTile").css("visibility", "visible");
+                            },
+                            done: function () {
+
+                                $("#mobile_miniTile").css("visibility", "hidden");
+
+                                $("#mobile_miniTile").position({
+                                    of: $("#mobile_playerInTurn"),
+                                    my: "center",
+                                    at: "center"
+                                });
+
+                                viewModel.mobile_addTile(tile, "first");
+
+                                var selector_firstTile = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
+
+
+                                $(selector_firstTile).position({
+                                    of: $(".mobile_playFirst"),
+                                    my: "center",
+                                    at: "center"
+                                });
+
+                                animateTilePlayedOnScreen(selector_firstTile, "first");
+                            }
+                        })
                     }
 
                 } break;
@@ -823,11 +1211,17 @@
                     {
                         viewModel.mobile_addTile(tile, "last");
 
-                        $(".mobile_playLast > .tile[data-tileid='" + tile.id + "']").position({
+                        var selector_lastTile = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
+
+                        animateTinyTileToPlay("last");
+
+                        $(selector_lastTile).position({
                             of: $(".mobile_playLast"),
-                            my: "right",
-                            at: "right"
+                            my: "center",
+                            at: "center"
                         });
+
+                        animateTilePlayedOnScreen(selector_lastTile, "last");
                     }
                 } break;
             }
@@ -913,22 +1307,64 @@
     /***** gameplay *****/
     function initializeRound()
     {
-        //TODO 35: set the correct size for roundTileBoard, for now it's hardcoded
-
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
         tilesInRoundClient = 0;
+        list_firstDirectionIndex = 0;
+        list_lastDirectionIndex = 0;
+        
+
+        noMorePlaysAction("take");
+
+    }
+
+
+    function noMorePlaysAction(value)
+    {
+        /// <summary>Depending on how many available tiles are left, it shows the take tile or pass button. "pass" or "take" are the only options</summary>
+        /// <param name="value" type="string">the action to show</param>
+        switch (value) {
+            case "take":
+                {
+                    $("#takeTileContainer").show();
+                    $("#passTurnContainer").hide();
+                } break;
+            case "pass":
+                {
+                    $("#takeTileContainer").hide();
+                    $("#passTurnContainer").show();
+                } break;
+        }
     }
 
     //this is sending the tile object {id, value1, value2}
     function showPossibleTilePlays(tile)
     {
+        if (!viewModel.isUserSmallScreen())
+        {
+
+        }
+        else
+        {
+            if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
+            {
+                droppableTargetAnimationTimer = null;
+                generateDroppableZonesForPlays();                
+            }
+        }
+
         //hide all current options
         $(".droppableTileZone").css("visibility", "hidden");
 
 
         $(".droppableTileZone[class*='" + getDropClassForValue(tile.value1) + "']").css("visibility", "visible");
         $(".droppableTileZone[class*='" + getDropClassForValue(tile.value2) + "']").css("visibility", "visible");
+    }
+
+    function cleanUpBoard()
+    {
+        viewModel.mobile_firstPlayedTile.removeAll();
+        viewModel.mobile_lastPlayedTile.removeAll();
     }
 
 
@@ -945,16 +1381,15 @@
 
             case "SelectingTiles":
                 {
+                    $(".readyInfoShown").addClass("readyInfoHidden").removeClass("readyInfoShown")
                     $(".state").hide();
                     $(".selectTileContainer").show();
+                    cleanUpBoard();
                 } break;
             case "InProgress":
                 {
                     $(".state").hide();
                     $(".gameInProgress").show();
-
-                    //TODO 37: will need to refactor this once I have a table/viewer mode only
-                    initializeRound();
                 } break;
         }
 
@@ -964,11 +1399,47 @@
 
 
     $(".btnPassTurn").click(function () {
-        //TODO 38: only do this when in turn
 
+        //TODO 38: only do this when in turn
         gameHub.server.userPlayedTile(gameCode, null, null)
+        $(this).removeClass("passEnabled");
     });
 
+    $("#takeTileContainer").click(function () {
+        if ($(this).hasClass("takeEnabled")) {
+            gameHub.server.takeTile(gameCode);
+            $(this).removeClass("takeEnabled");
+        }
+    });
+
+    //bind window change events
+    $(window).bind("resize", function (e) {
+        updateUserScreenData();
+
+        //TODO 55: redraw tiles as needed when passing from one layout to the other
+    })
+
+    function updateUserScreenData()
+    {
+        //determine screensize & orientation
+        var screenWidth = $(document).width();
+        var screenHeight = $(document).height();
+
+        //landscape
+        if (screenWidth > screenHeight) {
+            viewModel.screenOrientation("landscape");
+        }
+        else {
+            viewModel.screenOrientation("portrait");
+        }
+
+        if (screenWidth <= 768) {
+            viewModel.isUserSmallScreen(true);
+        }
+        else {
+            viewModel.isUserSmallScreen(false);
+        }
+    }
 
     function setupPlayer()
     {
@@ -982,28 +1453,7 @@
             $("#btnRoundReady").show();
         }
 
-        //determine screensize & orientation
-        var screenWidth = $(document).width();
-        var screenHeight = $(document).height();
-
-        //landscape
-        if(screenWidth > screenHeight)
-        {
-            viewModel.screenOrientation("landscape");
-        }
-        else
-        {
-            viewModel.screenOrientation("portrait");
-        }
-
-        if(screenWidth <= 768)
-        {
-            viewModel.isUserSmallScreen(true);
-        }
-        else
-        {
-            viewModel.isUserSmallScreen(false);
-        }
+        updateUserScreenData();
     }
 
 
@@ -1015,6 +1465,12 @@
         collision: "none"        
     });
 
+    $("#mobile_miniTile").position({
+        of: $("#mobile_playerInTurn"),
+        my: "center",
+        at: "center",
+        collision: "none"
+    })
 
     viewModel.setMessage("Game will begin when all players are ready...");
 
@@ -1029,6 +1485,27 @@
         for(i = 0; i < array.length; i++)
         {
             WriteConsole(JSON.stringify(array[i]));
+        }
+    }
+
+    if(debugConsoleEnabled)
+    {
+        $("#debugConsole").tabs();
+
+        $("#toggleDebugConsoleContainer > a").click(function () {
+            $("#debugConsole").toggle();
+        })
+    }
+
+    function WriteConsole(message) {
+        if (debug == true) {
+            console.log(message)
+            if(debugConsoleEnabled)
+            {
+                if ($("#debug_consoleViewer").children("div").length > 60)
+                    $("#debug_consoleViewer > div").first().remove();
+                $("#debug_consoleViewer").append("<div>" + message + "</div>");
+            }
         }
     }
 

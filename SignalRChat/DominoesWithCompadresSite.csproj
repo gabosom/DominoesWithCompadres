@@ -161,12 +161,14 @@
     <Compile Include="Models\Round.cs" />
     <Compile Include="Models\Tile.cs" />
     <Compile Include="Models\Viewer.cs" />
+    <Compile Include="Models\ViewModel\GameException.cs" />
     <Compile Include="Models\ViewModel\GameStart.cs" />
     <Compile Include="Models\ViewModel\RoundResults.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Utils\GameService.cs" />
     <Compile Include="Utils\IGameService.cs" />
+    <Compile Include="Utils\SiteSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.css" />

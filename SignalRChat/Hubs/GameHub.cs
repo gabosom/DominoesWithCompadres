@@ -7,6 +7,7 @@ using DominoesWithCompadres.Utils;
 using DominoesWithCompadres.Models;
 using System.Threading;
 using DominoesWithCompadres.Models.ViewModel;
+using System.Threading.Tasks;
 
 namespace DominoesWithCompadres.Hubs
 {
@@ -14,44 +15,21 @@ namespace DominoesWithCompadres.Hubs
     {
         public void JoinGame(string displayName, string gameCode, UserType userType)
         {
-            //add user to Game
-            DominoGame game = GameService.Get(gameCode);
-            
+
+            bool userJoinedSuccessfully = false;
             switch(userType)
             {
                 case UserType.Player:
                     {
-                        Player newPlayer = new Player()
-                        {
-                            ConnectionID = Context.ConnectionId,
-                            DisplayName = displayName,
-                            ID = GameService.GeneratePlayerId()
-                        };
-                        game.AddPlayer(newPlayer);
-                        Clients.OthersInGroup(gameCode).playerJoinedGame(newPlayer);
+                        userJoinedSuccessfully = GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, this);                        
                     }break;
 
                 case UserType.Viewer:
                     {
-                        Viewer newViewer = new Viewer()
-                        {
-                            ConnectionID = Context.ConnectionId,
-                            ID = GameService.GeneratePlayerId()
-                        };
-                        game.AddViewer(newViewer);
+                        GameService.ViewerJoined(gameCode, Context.ConnectionId, this);
                     }break;
             }
-            
-            
 
-            
-
-            //add user to SignalR group
-            Groups.Add(Context.ConnectionId, gameCode);
-
-            Thread.Sleep(500);
-
-            Clients.Caller.setupGame(game);            
         }
     
         public void UserReady(string gameCode)
@@ -66,11 +44,17 @@ namespace DominoesWithCompadres.Hubs
             if (game.IsEveryoneReady())
             {
                 Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
+                Clients.Group(gameCode).initializeRound(game.CurrentRound);
                 Clients.Group(gameCode).updateGameState(game.State.ToString());
             }
 
         }
     
+        public void TakeTile(string gameCode)
+        {
+            GameService.UserTakesTile(Context.ConnectionId, gameCode, this);
+        }
+
         public void SelectedTile(string gameCode, int tileId)
         {
 
@@ -98,14 +82,14 @@ namespace DominoesWithCompadres.Hubs
                 {
                     game.StartRound();
                     Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                    Clients.Group(gameCode).removeAvailableTiles((7 * game.Players.Count));
+                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
             }
         }
 
         public void UserPlayedTile(string gameCode, Tile tilePlayed, string listPosition)
         {
-
             //TODO 16: try/catch
             DominoGame game = GameService.Get(gameCode);
 
@@ -125,7 +109,7 @@ namespace DominoesWithCompadres.Hubs
                     }
                     else
                     {
-                        //TODO 17: alert clients, what could go wrong here? maybe other clients trying to hack the game
+                        Clients.Caller.error(new Exception("Tile played is no good"));
                     }
                 }
                 else
@@ -144,12 +128,46 @@ namespace DominoesWithCompadres.Hubs
                     case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
                     case GameState.RoundFinished:
                         {
-                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game));
+                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
                             Clients.Group(gameCode).updateGameState(game.State.ToString());
                         } break;
                     case GameState.Finished: break;
                 }
             }
+        }
+
+
+        /** Deal with connection issues**/
+        public override Task OnConnected()
+        {
+            // Add your own code here.
+            // For example: in a chat application, record the association between
+            // the current connection ID and user name, and mark the user as online.
+            // After the code in this method completes, the client is informed that
+            // the connection is established; for example, in a JavaScript client,
+            // the start().done callback is executed.
+            return base.OnConnected();
+        }
+
+        public override Task OnDisconnected()
+        {
+            // Add your own code here.
+            // For example: in a chat application, mark the user as offline, 
+            // delete the association between the current connection id and user name.
+            
+            //mark player that is not playing as disconnected
+            GameService.UserDisconnected(Clients.Caller.gameCode, this.Context.ConnectionId, this);
+
+            return base.OnDisconnected();
+        }
+
+        public override Task OnReconnected()
+        {
+            // Add your own code here.
+            // For example: in a chat application, you might have marked the
+            // user as offline after a period of inactivity; in that case 
+            // mark the user as online again.
+            return base.OnReconnected();
         }
     }
 }
