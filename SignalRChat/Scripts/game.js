@@ -44,7 +44,6 @@
 
             for (i = 0; i < game.Players.length; i++) {
                 this.addPlayer(game.Players[i]);
-                //this.players.push(game.Players[i]);
             }
 
             this.state(game.State);
@@ -71,7 +70,7 @@
 
             //one loop to add it all back
             for (i = 0; i < players.length; i++)
-                self.players.push(players[i]);
+                self.addPlayer(players[i]);
         };
 
         self.setAvailableTiles = function (tiles) {

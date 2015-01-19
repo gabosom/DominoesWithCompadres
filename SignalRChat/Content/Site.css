@@ -52,6 +52,13 @@ input[type="checkbox"].input-validation-error {
     text-align:center;
 }
 
+    #mobile_playerInTurn > .userPass{
+        visibility: hidden;
+        background-color: blue;
+        border-radius: 5px;
+        padding:3px;
+    }
+
 .gameInfoContainer {
     margin: 10px 0px;
 }
@@ -72,6 +79,11 @@ input[type="checkbox"].input-validation-error {
 
 .player{
 
+}
+
+.player.openSeat{
+    font-style:italic;
+    color:#AAA;
 }
 
 .active
@@ -422,6 +434,7 @@ input[type="checkbox"].input-validation-error {
 
     .mobile_playerList{
         width:350px;
+        margin:auto;
     }
 
     /* Layout for mobile divs in game*/
