@@ -53,10 +53,12 @@ input[type="checkbox"].input-validation-error {
 }
 
     #mobile_playerInTurn > .userPass{
-        visibility: hidden;
+        opacity:0;
         background-color: blue;
         border-radius: 5px;
         padding:3px;
+        color:white;
+        font-weight:bold;
     }
 
 .gameInfoContainer {
@@ -321,11 +323,6 @@ input[type="checkbox"].input-validation-error {
 .myTileContainer > .selected{
     border: 2px solid red;
 }
-
-.btnPassTurn{
-    visibility:hidden;
-}
-
 
 /*** Hide really small resolution ***/
 #resolutionTooSmall{

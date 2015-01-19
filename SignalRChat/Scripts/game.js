@@ -237,6 +237,7 @@
         if (gameHub.connection.id == playerId)
             viewModel.addRoundTileWithTile(tile);
         
+        animateUserPass(playerId)
         viewModel.availableTiles.pop();
     };
 
@@ -281,6 +282,11 @@
         playTileOnBoard(tile, listPosition);
 
         updatePlayerInTurn(nextPlayerInTurn);
+    };
+
+    gameHub.client.userPasses = function (playerPositionIndex) {
+        WriteConsole("User " + playerPositionIndex + " passes turn");
+        animateUserPass(playerPositionIndex);
     };
 
     gameHub.client.roundFinished = function (roundResults, players) {
@@ -514,6 +520,26 @@
             $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(true, true);
         }
     }
+
+    function animateUserPass(playerConnectionId)
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+            //desktop
+        }
+        else
+        {
+            $(".userPass").css("opacity", "1").animate(
+                {
+                    "opacity": "0"
+                },
+                {
+                    duration: 1000
+                }
+            )
+        }
+    }
+
 
     function animateTinyTileToPlay(listPosition) {
 

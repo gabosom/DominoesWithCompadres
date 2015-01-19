@@ -114,10 +114,14 @@ namespace DominoesWithCompadres.Hubs
                 }
                 else
                 {
+
+                    Clients.Group(gameCode).userPasses(Context.ConnectionId);
+
                     game.PlayerPassTurn(Context.ConnectionId);
 
                     //TODO 21: send message to clients to show something like a pass message
                     //TODO 22: Round over when all players pass
+                    
                     Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
                 }
 
