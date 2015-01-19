@@ -310,6 +310,8 @@
     ///user getting ready for round
     $("#btnRoundReady").click(function () {
         $(".readyInfoHidden").addClass("readyInfoShown").removeClass("readyInfoHidden");
+        $("#btnRoundReady").addClass("readyButtonDisabled");
+
         //TODO 6: make ready button like its pressed and disabled
 
         gameHub.server.userReady($("#gameCode").val());
@@ -1309,6 +1311,8 @@
     {
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
+        $("#btnRoundReady").removeClass("readyButtonDisabled");
+
         tilesInRoundClient = 0;
         list_firstDirectionIndex = 0;
         list_lastDirectionIndex = 0;

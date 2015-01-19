@@ -136,6 +136,11 @@ input[type="checkbox"].input-validation-error {
     text-align: center;
 }
 
+.readyButtonDisabled{
+    color:gray;
+    cursor: default;
+}
+
 /*** Users getting ready for round ***/
 .readyInfoHidden {
     visibility:hidden;
