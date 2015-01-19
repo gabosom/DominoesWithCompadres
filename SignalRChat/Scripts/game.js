@@ -253,6 +253,7 @@
             //TODO 3: animation for taken
             tilesInRoundClient--;
             $(tileSelector).addClass("otherSelected");
+
         }
     };
 
@@ -613,8 +614,6 @@
     //accepts values is an array of numbers
     //listPosition is a string with 2 possibel values "first" or "last"
     function createDroppableTarget(acceptsValues, listPosition) {
-
-        //TODO 8: validate that listPosition is a valid place
 
         //generate tile droppable zone 
         var drop = document.createElement("div");
@@ -1297,7 +1296,8 @@
             {
                 if (viewModel.myRoundTiles().length < 7 && tilesInRoundClient < 7) {
                     var selectedTileId = $(this).attr("data-tileid");
-                    gameHub.server.selectedTile(gameCode, selectedTileId);
+
+                    window.setTimeout(2000, gameHub.server.selectedTile(gameCode, selectedTileId));
                 }
 
                 tilesInRoundClient++;
