@@ -43,7 +43,8 @@
             this.createdDate(game.CreatedDate);
 
             for (i = 0; i < game.Players.length; i++) {
-                this.players.push(game.Players[i]);
+                this.addPlayer(game.Players[i]);
+                //this.players.push(game.Players[i]);
             }
 
             this.state(game.State);
@@ -54,7 +55,15 @@
         };
 
         this.addPlayer = function (player) {
+            this.players.remove(function (item) {
+                return item.DisplayName == "open seat";
+            });
+
             this.players.push(player);
+
+            //add rest of seats with empty players
+            for(i = this.players().length; i < 4 ; i++)
+                this.players.push({"DisplayName":"open seat", "points": "0"});
         };
 
         self.updatePlayers = function (players) {
@@ -1403,7 +1412,6 @@
 
 
     $(".btnPassTurn").click(function () {
-
         //TODO 38: only do this when in turn
         gameHub.server.userPlayedTile(gameCode, null, null)
         $(this).removeClass("passEnabled");
