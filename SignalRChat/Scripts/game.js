@@ -1422,6 +1422,11 @@
                     $(".readyInfoShown").addClass("readyInfoHidden").removeClass("readyInfoShown")
                     $(".state").hide();
                     $(".selectTileContainer").show();
+                    $(".selectTileContainer").position({
+                        of: $("#boardContainer"),
+                        my: "center",
+                        at: "center"
+                    });
                     cleanUpBoard();
                 } break;
             case "InProgress":
