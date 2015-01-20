@@ -169,22 +169,19 @@ input[type="checkbox"].input-validation-error {
 
 /**** Users selecting tiles ****/
 
-.takeDisabled{
+.takeDisabled, .passDisabled{
     color:#808080;
+    cursor: default;
 }
 
-.takeEnabled{
+.takeEnabled, .passEnabled{
     color:red;
     font-weight:bold;
     cursor:pointer;
+    visibility: visible;
 }
 
-.passDisabled{
 
-}
-.passEnabled{
-    visibility:visible;
-}
 
 .selectTileContainer{
     width:80%;
