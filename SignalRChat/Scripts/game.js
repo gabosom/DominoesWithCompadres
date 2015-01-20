@@ -43,7 +43,7 @@
             this.createdDate(game.CreatedDate);
 
             for (i = 0; i < game.Players.length; i++) {
-                this.players.push(game.Players[i]);
+                this.addPlayer(game.Players[i]);
             }
 
             this.state(game.State);
@@ -54,7 +54,15 @@
         };
 
         this.addPlayer = function (player) {
+            this.players.remove(function (item) {
+                return item.DisplayName == "open seat";
+            });
+
             this.players.push(player);
+
+            //add rest of seats with empty players
+            for(i = this.players().length; i < 4 ; i++)
+                this.players.push({"DisplayName":"open seat", "points": "0"});
         };
 
         self.updatePlayers = function (players) {
@@ -62,7 +70,7 @@
 
             //one loop to add it all back
             for (i = 0; i < players.length; i++)
-                self.players.push(players[i]);
+                self.addPlayer(players[i]);
         };
 
         self.setAvailableTiles = function (tiles) {
@@ -229,6 +237,7 @@
         if (gameHub.connection.id == playerId)
             viewModel.addRoundTileWithTile(tile);
         
+        animateUserPass(playerId)
         viewModel.availableTiles.pop();
     };
 
@@ -253,6 +262,7 @@
             //TODO 3: animation for taken
             tilesInRoundClient--;
             $(tileSelector).addClass("otherSelected");
+
         }
     };
 
@@ -272,6 +282,11 @@
         playTileOnBoard(tile, listPosition);
 
         updatePlayerInTurn(nextPlayerInTurn);
+    };
+
+    gameHub.client.userPasses = function (playerPositionIndex) {
+        WriteConsole("User " + playerPositionIndex + " passes turn");
+        animateUserPass(playerPositionIndex);
     };
 
     gameHub.client.roundFinished = function (roundResults, players) {
@@ -310,6 +325,8 @@
     ///user getting ready for round
     $("#btnRoundReady").click(function () {
         $(".readyInfoHidden").addClass("readyInfoShown").removeClass("readyInfoHidden");
+        $("#btnRoundReady").addClass("readyButtonDisabled");
+
         //TODO 6: make ready button like its pressed and disabled
 
         gameHub.server.userReady($("#gameCode").val());
@@ -504,6 +521,26 @@
         }
     }
 
+    function animateUserPass(playerConnectionId)
+    {
+        if(!viewModel.isUserSmallScreen())
+        {
+            //desktop
+        }
+        else
+        {
+            $(".userPass").css("opacity", "1").animate(
+                {
+                    "opacity": "0"
+                },
+                {
+                    duration: 1000
+                }
+            )
+        }
+    }
+
+
     function animateTinyTileToPlay(listPosition) {
 
         var positionToGoTo = null;
@@ -611,8 +648,6 @@
     //accepts values is an array of numbers
     //listPosition is a string with 2 possibel values "first" or "last"
     function createDroppableTarget(acceptsValues, listPosition) {
-
-        //TODO 8: validate that listPosition is a valid place
 
         //generate tile droppable zone 
         var drop = document.createElement("div");
@@ -1295,7 +1330,8 @@
             {
                 if (viewModel.myRoundTiles().length < 7 && tilesInRoundClient < 7) {
                     var selectedTileId = $(this).attr("data-tileid");
-                    gameHub.server.selectedTile(gameCode, selectedTileId);
+
+                    window.setTimeout(2000, gameHub.server.selectedTile(gameCode, selectedTileId));
                 }
 
                 tilesInRoundClient++;
@@ -1309,6 +1345,8 @@
     {
         //remove selectes state from selectTiles
         $("#selectTiles > .tile").removeClass("selected").removeClass("otherSelected");
+        $("#btnRoundReady").removeClass("readyButtonDisabled");
+
         tilesInRoundClient = 0;
         list_firstDirectionIndex = 0;
         list_lastDirectionIndex = 0;
@@ -1384,6 +1422,11 @@
                     $(".readyInfoShown").addClass("readyInfoHidden").removeClass("readyInfoShown")
                     $(".state").hide();
                     $(".selectTileContainer").show();
+                    $(".selectTileContainer").position({
+                        of: $("#boardContainer"),
+                        my: "center",
+                        at: "center"
+                    });
                     cleanUpBoard();
                 } break;
             case "InProgress":
@@ -1399,7 +1442,6 @@
 
 
     $(".btnPassTurn").click(function () {
-
         //TODO 38: only do this when in turn
         gameHub.server.userPlayedTile(gameCode, null, null)
         $(this).removeClass("passEnabled");

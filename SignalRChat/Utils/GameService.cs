@@ -199,7 +199,14 @@ namespace DominoesWithCompadres.Utils
 
         public static void SendExceptionToClients(Exception e, string gameCode, GameHub gameHub)
         {
-            gameHub.Clients.Group(gameCode).error(e);
+            try
+            {
+                gameHub.Clients.Group(gameCode).error(e);
+            }
+            catch
+            {
+                //log at some point
+            }
         }
 
 

@@ -179,6 +179,7 @@
     <Content Include="Content\img\tile_4.png" />
     <Content Include="Content\img\tile_5.png" />
     <Content Include="Content\img\tile_6.png" />
+    <Content Include="Content\img\wood_for_desktop.jpg" />
     <Content Include="Content\jqueryui\images\ui-bg_diagonals-thick_18_b81900_40x40.png" />
     <Content Include="Content\jqueryui\images\ui-bg_diagonals-thick_20_666666_40x40.png" />
     <Content Include="Content\jqueryui\images\ui-bg_flat_10_000000_40x100.png" />

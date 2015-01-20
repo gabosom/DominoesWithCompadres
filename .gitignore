@@ -119,8 +119,6 @@ _[Ss]cripts
 *.suo
 DominoesWithCompadres.v12.suo
 *.suo
-SignalRChat/Properties/PublishProfiles/dominoeswithcompadres - FTP.pubxml.user
-SignalRChat/Properties/PublishProfiles/dominoeswithcompadres - FTP.pubxml.user
-SignalRChat/Scripts/1tjp3jw0.5gr
-SignalRChat/Scripts/bwfdd5ga.omt
+*.omt
+*.5gr
 *.kz2
