@@ -230,7 +230,10 @@ namespace DominoesWithCompadres.Utils
                     game.RemoveViewer(userConnectionId);
                 }
 
-                gamehub.Clients.Group(gameCode).error(new Exception(p.DisplayName + " was disconnected."));
+                if (game.Players.Count > 0 || game.Viewers.Count > 0)
+                    gamehub.Clients.Group(gameCode).error(new Exception(p.DisplayName + " was disconnected."));
+                else
+                    GameService.CurrentGames.RemoveAll(m => m.GameCode.Equals(gameCode));
             }
             catch(Exception e)
             {
