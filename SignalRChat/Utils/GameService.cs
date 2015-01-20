@@ -169,30 +169,35 @@ namespace DominoesWithCompadres.Utils
 
         internal static void UserTakesTile(string playerConnectionId, string gameCode, Hubs.GameHub gameHub)
         {
-            //find game and player
-            //TODO: try/catch
-            DominoGame game = GameService.Get(gameCode);
-
-            if(game.Players[game.PlayerInTurn()].ConnectionID.Equals(playerConnectionId))
+            try
             {
-                Tile t = game.UserTakesTile(game.GetPlayer(playerConnectionId));
+                DominoGame game = GameService.Get(gameCode);
 
-                if(t != null)
+                if (game.Players[game.PlayerInTurn()].ConnectionID.Equals(playerConnectionId))
                 {
-                    //alert client of the new tile
-                    gameHub.Clients.Group(gameCode).addTakenTile(t, playerConnectionId);
+                    Tile t = game.UserTakesTile(game.GetPlayer(playerConnectionId));
 
-                    //alert everyone of the new user
-                    gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                    if (t != null)
+                    {
+                        //alert client of the new tile
+                        gameHub.Clients.Group(gameCode).addTakenTile(t, playerConnectionId);
+
+                        //alert everyone of the new user
+                        gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                    }
+                    else
+                    {
+                        //TODO: there are no tiles left or couldn't get tile
+                    }
                 }
                 else
                 {
-                    //TODO: there are no tiles left or couldn't get tile
+                    //TODO: user is not in turn, what to do here
                 }
             }
-            else
+            catch(Exception e)
             {
-                //TODO: user is not in turn, what to do here
+                GameService.SendExceptionToClients(e, gameCode, gameHub);
             }
         }
 
@@ -310,47 +315,54 @@ namespace DominoesWithCompadres.Utils
 
                 Player p = game.GetPlayer(playerConnectionId);
 
-                if (p != null)
+                if (p == game.Players[game.CurrentRound.PlayerInTurn])
                 {
-                    if (tilePlayed != null)
+                    if (p != null)
                     {
-
-                        bool playIsGood = game.PlayedTile(playerConnectionId, tilePlayed, listPosition);
-
-                        if (playIsGood)
+                        if (tilePlayed != null)
                         {
-                            gameHub.Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
+
+                            bool playIsGood = game.PlayedTile(playerConnectionId, tilePlayed, listPosition);
+
+                            if (playIsGood)
+                            {
+                                gameHub.Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
+                            }
+                            else
+                            {
+                                gameHub.Clients.Caller.error(new Exception("Tile played is no good"));
+                            }
                         }
                         else
                         {
-                            gameHub.Clients.Caller.error(new Exception("Tile played is no good"));
+
+                            gameHub.Clients.Group(gameCode).userPasses(playerConnectionId);
+
+                            game.PlayerPassTurn(playerConnectionId);
+
+                            //TODO 21: send message to clients to show something like a pass message
+                            //TODO 22: Round over when all players pass
+
+                            gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                        }
+
+
+                        //check what the game state is
+                        switch (game.State)
+                        {
+                            case GameState.InProgress: gameHub.Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
+                            case GameState.RoundFinished:
+                                {
+                                    gameHub.Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
+                                    gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());
+                                } break;
+                            case GameState.Finished: break;
                         }
                     }
-                    else
-                    {
-
-                        gameHub.Clients.Group(gameCode).userPasses(playerConnectionId);
-
-                        game.PlayerPassTurn(playerConnectionId);
-
-                        //TODO 21: send message to clients to show something like a pass message
-                        //TODO 22: Round over when all players pass
-
-                        gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
-                    }
-
-
-                    //check what the game state is
-                    switch (game.State)
-                    {
-                        case GameState.InProgress: gameHub.Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
-                        case GameState.RoundFinished:
-                            {
-                                gameHub.Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
-                                gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());
-                            } break;
-                        case GameState.Finished: break;
-                    }
+                }
+                else
+                {
+                    GameService.SendExceptionToClients(new Exception("User passing is not the user in turn!"), gameCode, gameHub);
                 }
             }
             catch(Exception e)

@@ -1442,13 +1442,15 @@
 
 
     $(".btnPassTurn").click(function () {
-        //TODO 38: only do this when in turn
-        gameHub.server.userPlayedTile(gameCode, null, null)
-        $(this).removeClass("passEnabled");
+        if (userInTurn)
+        {
+            gameHub.server.userPlayedTile(gameCode, null, null)
+            $(this).removeClass("passEnabled");
+        }
     });
 
     $("#takeTileContainer").click(function () {
-        if ($(this).hasClass("takeEnabled")) {
+        if ($(this).hasClass("takeEnabled") && userInTurn) {
             gameHub.server.takeTile(gameCode);
             $(this).removeClass("takeEnabled");
         }
