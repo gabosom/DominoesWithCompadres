@@ -1024,10 +1024,14 @@
         //finish all animations
         finishAllAnimations();
 
+        //remove class from recentlyplayed tile
+        $("div.recentlyPlayedTile").removeClass("recentlyPlayedTile");
+
         //if the user is in a big screen
         if(!viewModel.isUserSmallScreen())
         {
             var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
+            $(tileSelector).addClass("recentlyPlayedTile");
             
             switch (listPosition) {
                 case "first": {
@@ -1069,6 +1073,8 @@
                     tileSelector = ".mobile_playFirst > .tile[data-tileid='" + tile.id + "']";
                     anchorSelector = ".mobile_playFirst";
 
+                    $(tileSelector).addClass("recentlyPlayedTile");
+
                     //put tile on board and animate
                     $(tileSelector).position({
                         of: $(anchorSelector),
@@ -1082,6 +1088,8 @@
                 case "last": {                    
                     tileSelector = ".mobile_playLast > .tile[data-tileid='" + tile.id + "']";
                     anchorSelector = ".mobile_playLast";
+
+                    $(tileSelector).addClass("recentlyPlayedTile");
 
                     //put tile on board and animate
                     $(tileSelector).position({
@@ -1099,6 +1107,9 @@
 
                     f_anchorSelector = ".mobile_playFirst";
                     l_anchorSelector = ".mobile_playLast";
+
+                    $(f_tileSelector).addClass("recentlyPlayedTile");
+                    $(l_tileSelector).addClass("recentlyPlayedTile");
 
                     //put tile on board and animate
                     $(f_tileSelector).position({
