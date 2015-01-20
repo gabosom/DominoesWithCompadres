@@ -42,8 +42,8 @@
             this.id(game.ID);
             this.createdDate(game.CreatedDate);
 
-            for (i = 0; i < game.Players.length; i++) {
-                this.addPlayer(game.Players[i]);
+            for (i_players = 0; i_players < game.Players.length; i_players++) {
+                this.addPlayer(game.Players[i_players]);
             }
 
             this.state(game.State);

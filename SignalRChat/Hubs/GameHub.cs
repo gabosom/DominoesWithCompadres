@@ -15,13 +15,11 @@ namespace DominoesWithCompadres.Hubs
     {
         public void JoinGame(string displayName, string gameCode, UserType userType)
         {
-
-            bool userJoinedSuccessfully = false;
             switch(userType)
             {
                 case UserType.Player:
                     {
-                        userJoinedSuccessfully = GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, this);                        
+                        GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, this);                        
                     }break;
 
                 case UserType.Viewer:
@@ -29,7 +27,6 @@ namespace DominoesWithCompadres.Hubs
                         GameService.ViewerJoined(gameCode, Context.ConnectionId, this);
                     }break;
             }
-
         }
     
         public void UserReady(string gameCode)
@@ -46,87 +43,12 @@ namespace DominoesWithCompadres.Hubs
 
         public void SelectedTile(string gameCode, int tileId)
         {
-
-            //TODO 15: try/catch
-            DominoGame game = GameService.Get(gameCode);
-
-            //TODO: this player logic should go in the GameService
-            Player p = game.GetPlayer(Context.ConnectionId);
-
-            if(p != null)
-            {
-                bool selectedTile = game.SelectTile(Context.ConnectionId, tileId);
-
-                //if user took tile successfully
-                if (selectedTile)
-                {
-                    Clients.OthersInGroup(gameCode).otherUserTookTile(tileId);
-                }
-
-                //always notify caller of what happened
-                //TODO: shouldn't send this if the caller is not a player
-                Clients.Caller.ITookTile(tileId, selectedTile);
-            
-                if(game.ReadyForRoundStart())
-                {
-                    game.StartRound();
-                    Clients.Group(gameCode).updateGameState(game.State.ToString());
-                    Clients.Group(gameCode).removeAvailableTiles((7 * game.Players.Count));
-                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
-                }
-            }
+            GameService.UserSelectedTile(gameCode, Context.ConnectionId, tileId, this);
         }
 
         public void UserPlayedTile(string gameCode, Tile tilePlayed, string listPosition)
         {
-            //TODO 16: try/catch
-            DominoGame game = GameService.Get(gameCode);
-
-            //TODO: this player logic should go in the GameService
-            Player p = game.GetPlayer(Context.ConnectionId);
-
-            if(p != null)
-            { 
-                if(tilePlayed != null)
-                {
-                
-                    bool playIsGood = game.PlayedTile(Context.ConnectionId, tilePlayed, listPosition);
-
-                    if(playIsGood)
-                    {
-                        Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
-                    }
-                    else
-                    {
-                        Clients.Caller.error(new Exception("Tile played is no good"));
-                    }
-                }
-                else
-                {
-
-                    Clients.Group(gameCode).userPasses(Context.ConnectionId);
-
-                    game.PlayerPassTurn(Context.ConnectionId);
-
-                    //TODO 21: send message to clients to show something like a pass message
-                    //TODO 22: Round over when all players pass
-                    
-                    Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
-                }
-
-
-                //check what the game state is
-                switch(game.State)
-                {
-                    case GameState.InProgress: Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
-                    case GameState.RoundFinished:
-                        {
-                            Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
-                            Clients.Group(gameCode).updateGameState(game.State.ToString());
-                        } break;
-                    case GameState.Finished: break;
-                }
-            }
+            GameService.UserPlaysTile(gameCode, Context.ConnectionId, tilePlayed, listPosition, this);
         }
 
 

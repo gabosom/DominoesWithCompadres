@@ -263,5 +263,100 @@ namespace DominoesWithCompadres.Utils
                 SendExceptionToClients(e, gameCode, gameHub);
             }
         }
+
+        internal static void UserSelectedTile(string gameCode, string playerConnectionId, int tileId, GameHub gameHub)
+        {
+            try
+            {
+                DominoGame game = GameService.Get(gameCode);
+
+                //TODO: this player logic should go in the GameService
+                Player p = game.GetPlayer(playerConnectionId);
+
+                if (p != null)
+                {
+                    bool selectedTile = game.SelectTile(playerConnectionId, tileId);
+
+                    //if user took tile successfully
+                    if (selectedTile)
+                    {
+                        gameHub.Clients.OthersInGroup(gameCode).otherUserTookTile(tileId);
+                    }
+
+                    //always notify caller of what happened
+                    //TODO: shouldn't send this if the caller is not a player
+                    gameHub.Clients.Caller.ITookTile(tileId, selectedTile);
+
+                    if (game.ReadyForRoundStart())
+                    {
+                        game.StartRound();
+                        gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());
+                        gameHub.Clients.Group(gameCode).removeAvailableTiles((7 * game.Players.Count));
+                        gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                SendExceptionToClients(e, gameCode, gameHub);
+            }
+        }
+
+        internal static void UserPlaysTile(string gameCode, string playerConnectionId, Tile tilePlayed, string listPosition, GameHub gameHub)
+        {
+            try
+            {
+                DominoGame game = GameService.Get(gameCode);
+
+                Player p = game.GetPlayer(playerConnectionId);
+
+                if (p != null)
+                {
+                    if (tilePlayed != null)
+                    {
+
+                        bool playIsGood = game.PlayedTile(playerConnectionId, tilePlayed, listPosition);
+
+                        if (playIsGood)
+                        {
+                            gameHub.Clients.OthersInGroup(gameCode).userPlayedTile(tilePlayed, game.CurrentRound.PlayerInTurn, listPosition);
+                        }
+                        else
+                        {
+                            gameHub.Clients.Caller.error(new Exception("Tile played is no good"));
+                        }
+                    }
+                    else
+                    {
+
+                        gameHub.Clients.Group(gameCode).userPasses(playerConnectionId);
+
+                        game.PlayerPassTurn(playerConnectionId);
+
+                        //TODO 21: send message to clients to show something like a pass message
+                        //TODO 22: Round over when all players pass
+
+                        gameHub.Clients.Group(gameCode).updatePlayerInTurn(game.CurrentRound.PlayerInTurn);
+                    }
+
+
+                    //check what the game state is
+                    switch (game.State)
+                    {
+                        case GameState.InProgress: gameHub.Clients.Caller.updatePlayerInTurn(game.CurrentRound.PlayerInTurn); break;
+                        case GameState.RoundFinished:
+                            {
+                                gameHub.Clients.Group(gameCode).roundFinished(GameService.GetRoundResults(game), game.Players);
+                                gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());
+                            } break;
+                        case GameState.Finished: break;
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                SendExceptionToClients(e, gameCode, gameHub);
+            }
+        }
     }
 }
