@@ -34,19 +34,8 @@ namespace DominoesWithCompadres.Hubs
     
         public void UserReady(string gameCode)
         {
-            //TODO 14 try/catch
-            DominoGame game = GameService.Get(gameCode);
 
-            //TODO #19 try/catch
-            game.PlayerReady(Context.ConnectionId);
-
-
-            if (game.IsEveryoneReady())
-            {
-                Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
-                Clients.Group(gameCode).initializeRound(game.CurrentRound);
-                Clients.Group(gameCode).updateGameState(game.State.ToString());
-            }
+            GameService.PlayerReady(gameCode, Context.ConnectionId, this);
 
         }
     

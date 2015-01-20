@@ -240,5 +240,28 @@ namespace DominoesWithCompadres.Utils
                 SendExceptionToClients(e, gameCode, gamehub);
             }
         }
+
+        internal static void PlayerReady(string gameCode, string playerConnectionId, GameHub gameHub)
+        {
+            try
+            {
+                DominoGame game = GameService.Get(gameCode);
+
+                game.PlayerReady(playerConnectionId);
+
+
+                if (game.IsEveryoneReady())
+                {
+                    gameHub.Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
+                    gameHub.Clients.Group(gameCode).initializeRound(game.CurrentRound);
+                    gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());
+                }
+
+            }
+            catch(Exception e)
+            {
+                SendExceptionToClients(e, gameCode, gameHub);
+            }
+        }
     }
 }
