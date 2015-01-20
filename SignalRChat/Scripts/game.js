@@ -483,19 +483,21 @@
                 $(firstDropTarget).position({
                     of: $(".mobile_playFirst"),
                     my: "center",
-                    at: "center"
+                    at: "center",
+                    collision: "none"
                 });
 
                 $(lastDropTarget).position({
                     of: $(".mobile_playLast"),
                     my: "center",
-                    at: "center"
+                    at: "center",
+                    collision: "none"
                 });
             }
             else
             {
-                if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
-                {
+                //if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
+                //{
                     //if something is being animated, just wait
                     if ($("div").filter(":animated").length > 0)
                     {
@@ -507,7 +509,11 @@
                     else
                     {
                         $(".droppableTileZone").remove();
-                        droppableTargetAnimationTimer = null;
+                        if (droppableTargetAnimationTimer != null)
+                        {
+                            window.clearTimeout(droppableTargetAnimationTimer);
+                            droppableTargetAnimationTimer = null;
+                        }
                         WriteConsole("Generating droppable is happening");
                         var firstTile = viewModel.playedTiles()[0];
                         var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
@@ -524,7 +530,7 @@
                         positionTileOnBoard(firstDropTarget, ".mobile_playFirst > .tile[data-tileid='" + firstTile.id + "']", "first");
                         positionTileOnBoard(lastDropTarget, ".mobile_playLast > .tile[data-tileid='" + lastTile.id + "']", "last");
                     }
-                }
+                //}
             }
         }
     }

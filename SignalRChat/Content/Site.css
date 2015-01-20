@@ -318,6 +318,7 @@ input[type="checkbox"].input-validation-error {
 .roundTileBoard{
     width: 100%;
     height: 500px;
+    /*position:relative;*/
     /*border: 1px solid pink;*/
 }
 
@@ -533,6 +534,7 @@ input[type="checkbox"].input-validation-error {
     {
         width:60px;
         height:30px;
+        position:absolute;
     }
 
         .mobile_playabbleArea > .tile > div
