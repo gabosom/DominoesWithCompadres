@@ -406,11 +406,14 @@
     function generateDroppableZonesForPlays() {
 
         WriteConsole("Generate Droppable Zones");
+
         if (!viewModel.isUserSmallScreen())
         {        
             //if the board is empty
             if (viewModel.playedTiles().length == 0) {
             
+                $(".droppableTileZone").remove();
+
                 //generate tile droppable zone and add it
                 var dropTarget = createDroppableTarget([0,1,2,3,4,5,6], "initial")
 
@@ -428,23 +431,37 @@
             //there are tiles in play
             //there are always two: first/last
             else {
-                var firstTile = viewModel.playedTiles()[0];
-                var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-                var firstOpenValue = getOpenValue("first");
-                var lastOpenValue = getOpenValue("last");
+                //if something is being animated, just wait
+                if ($("div").filter(":animated").length > 0) {
+                    WriteConsole("Generating droppable is paused, animation was happening");
 
-                WriteConsole("Open values= first: " + firstOpenValue + ", last: " + lastOpenValue);
+                    //TODO: could make the callback another function so when it calls back, it saves the first comparison again
+                    droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 500);
+                }
+                else {
+                    $(".droppableTileZone").remove();
+                    droppableTargetAnimationTimer = null;
+                    WriteConsole("Generating droppable is happening");
 
-                var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
-                var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
+                    var firstTile = viewModel.playedTiles()[0];
+                    var lastTile = viewModel.playedTiles()[viewModel.playedTiles().length - 1];
 
-                $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
+                    var firstOpenValue = getOpenValue("first");
+                    var lastOpenValue = getOpenValue("last");
 
-                //set positioning
-                positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileid='" + firstTile.id + "']", "first");
+                    WriteConsole("Open values= first: " + firstOpenValue + ", last: " + lastOpenValue);
 
-                positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileid='" + lastTile.id + "']", "last");
+                    var firstDropTarget = createDroppableTarget([firstOpenValue], "first");
+                    var lastDropTarget = createDroppableTarget([lastOpenValue], "last");
+
+                    $(".roundTileBoard").append(firstDropTarget).append(lastDropTarget);
+
+                    //set positioning
+                    positionTileOnBoard(firstDropTarget, ".roundTileBoard > .tile[data-tileid='" + firstTile.id + "']", "first");
+
+                    positionTileOnBoard(lastDropTarget, ".roundTileBoard > .tile[data-tileid='" + lastTile.id + "']", "last");
+                }
             }
         }
 
@@ -454,6 +471,8 @@
             //if the board is empty
             if(viewModel.playedTiles().length == 0)
             {
+                $(".droppableTileZone").remove();
+
                 var firstDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
                 var lastDropTarget = createDroppableTarget([0, 1, 2, 3, 4, 5, 6], "initial");
 
@@ -478,15 +497,16 @@
                 if ($(".mobile_playabbleArea > .droppableTileZone").length == 0)
                 {
                     //if something is being animated, just wait
-                    if ($(".mobile_playabbleArea > .tile").add("#mobile_miniTile").filter(":animated").length > 0)
+                    if ($("div").filter(":animated").length > 0)
                     {
                         WriteConsole("Generating droppable is paused, animation was happening");
 
                         //TODO: could make the callback another function so when it calls back, it saves the first comparison again
-                        droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 1000);
+                        droppableTargetAnimationTimer = window.setTimeout(generateDroppableZonesForPlays, 500);
                     }
                     else
                     {
+                        $(".droppableTileZone").remove();
                         droppableTargetAnimationTimer = null;
                         WriteConsole("Generating droppable is happening");
                         var firstTile = viewModel.playedTiles()[0];
@@ -513,11 +533,11 @@
     {
         if(!viewModel.isUserSmallScreen())
         {
-
+            $("div").filter(":animated").stop(false, true);
         }
         else
         {
-            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(true, true);
+            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(false, true);
         }
     }
 
@@ -579,6 +599,31 @@
     {
         if(!viewModel.isUserSmallScreen())
         {
+            var anchorContainer = ".roundTileBoard"
+            var droppableTileSelector = ".roundTileBoard > .tile[data-listposition='" + listPosition + "']";
+            var moveTileToPosition = $(droppableTileSelector).position();
+
+            if (((listPosition == "first") && (list_firstDirectionIndex % 2 == 1)) || ((listPosition == "last") && (list_lastDirectionIndex % 2 == 1)))
+                $(selectorForTile).addClass("horizontal");
+
+            if (((listPosition == "first") && (list_firstDirectionIndex == 2)) || ((listPosition == "last") && (list_lastDirectionIndex == 2)))
+                invertTileValueDivs(selectorForTile);
+
+            $(selectorForTile).position(
+                {
+                    of: $(anchorContainer),
+                    my: "center bottom",
+                    at: "center top"
+                });
+            
+            $(selectorForTile).animate(
+                {
+                    "left": moveTileToPosition.left,
+                    "top": moveTileToPosition.top
+                },
+                {
+                    duration: 750
+                });
         }
         else
         {
@@ -692,8 +737,6 @@
                 //TODO 29: enforce turn bool during moves
                 //empty selection, destroy droppables, & endturn
                 viewModel.mySelectedTile({});                
-                $(".droppableTileZone").remove();
-                
             }
         });
 
@@ -985,12 +1028,13 @@
         if(!viewModel.isUserSmallScreen())
         {
             var tileSelector = ".roundTileBoard > .tile[data-tileid='" + tile.id + "']";
-
+            
             switch (listPosition) {
                 case "first": {
                     var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[1].id + "']";
 
-                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    //positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
 
                     if (list_firstDirectionIndex % 2 == 1)
                         list_firstDirectionIndex = (list_firstDirectionIndex + 1) % 4;
@@ -999,7 +1043,8 @@
                 case "last": {
                     var anchorSelector = ".roundTileBoard > .tile[data-tileid='" + viewModel.playedTiles()[viewModel.playedTiles().length-2].id + "']";
 
-                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    //positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
 
                     if (list_lastDirectionIndex % 2 == 1)
                         list_lastDirectionIndex = (list_lastDirectionIndex + 1) % 4;
@@ -1008,7 +1053,8 @@
                 case "initial": {
                     var anchorSelector = ".roundTileBoard";
 
-                    positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    //positionTileOnBoard(tileSelector, anchorSelector, listPosition);
+                    animateTilePlayedOnScreen(tileSelector, listPosition);
                 }
             }
         }
@@ -1075,6 +1121,9 @@
 
             
         }
+
+        //need to do this here so everyone can animate correctly
+        generateDroppableZonesForPlays();
 
         return tile;
     }
@@ -1433,6 +1482,7 @@
                 {
                     $(".state").hide();
                     $(".gameInProgress").show();
+                    generateDroppableZonesForPlays();
                 } break;
         }
 

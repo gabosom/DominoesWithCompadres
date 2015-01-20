@@ -257,6 +257,8 @@ namespace DominoesWithCompadres.Utils
 
                 if (game.IsEveryoneReady())
                 {
+                    game.InitializeRound();
+                    Thread.Sleep(500);
                     gameHub.Clients.Group(gameCode).setAvailableTiles(game.AvailableTiles);
                     gameHub.Clients.Group(gameCode).initializeRound(game.CurrentRound);
                     gameHub.Clients.Group(gameCode).updateGameState(game.State.ToString());

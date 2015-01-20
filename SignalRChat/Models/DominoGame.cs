@@ -90,7 +90,7 @@ namespace DominoesWithCompadres.Models
             this.CurrentRound.PlayerInTurn = playerPosition;
         }
 
-        private void InitializeRound()
+        public void InitializeRound()
         {
             if (this.CurrentRound != null)
                 this.CurrentRound = null;
@@ -105,8 +105,6 @@ namespace DominoesWithCompadres.Models
             }
 
             this.GenerateTiles();
-            this.ReadyForRound = false;
-
         }
 
 
@@ -157,13 +155,6 @@ namespace DominoesWithCompadres.Models
         public void PlayerReady(string ConnectionId)
         {
             this.State = GameState.WaitingUsersReady;
-
-            if(this.State == GameState.RoundFinished || this.State == GameState.Finished || this.State == GameState.Created || this.CurrentRound == null)
-            {
-                //when restarting, need to remove previous tiles 
-                InitializeRound();
-            }
-
 
             Player currentPlayer = this.Players.Single(p => p.ConnectionID.Equals(ConnectionId));
             currentPlayer.IsReady = true;
@@ -283,8 +274,6 @@ namespace DominoesWithCompadres.Models
 
             if (isPlayCorrect)
             {
-
-
                 //remove tile from user's active tile
                 curPlayer.Tiles.Remove(tilePlayed);
 
@@ -327,6 +316,10 @@ namespace DominoesWithCompadres.Models
 
         private void RoundFinished(Player winner)
         {
+
+            //this flag has to be set everytime the game ends
+            this.ReadyForRound = false;
+
             this.CurrentRound.Results = new RoundResults();
 
             StringBuilder messageBuilder = new StringBuilder();

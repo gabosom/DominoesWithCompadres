@@ -135,6 +135,7 @@ input[type="checkbox"].input-validation-error {
     position:absolute;
     top:0px;
     left:0px;
+    z-index: 300;
 }
 
 .selectReadyContainer > .overlay
@@ -284,10 +285,15 @@ input[type="checkbox"].input-validation-error {
     border-color:#808080;
 }
 
+.playTile{
+    z-index: 200;
+}
+
 .droppableTileZone
 {
     border-style:dashed;
     visibility: hidden;
+    z-index: 100;
 }
 
 /******* Game In Progress CSS ******/
