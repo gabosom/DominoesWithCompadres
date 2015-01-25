@@ -65,11 +65,11 @@
                 this.players.push({"DisplayName":"open seat", "points": "0"});
         };
 
-        self.updatePlayers = function (players) {
+        self.updatePlayers = function (updatedPlayerList) {
             self.players.removeAll();
 
             //one loop to add it all back
-            for (i = 0; i < players.length; i++)
+            for (i = 0; i < updatedPlayerList.length; i++)
                 self.addPlayer(players[i]);
         };
 
@@ -628,7 +628,7 @@
                     "top": moveTileToPosition.top
                 },
                 {
-                    duration: 750
+                    duration: 500
                 });
         }
         else
@@ -643,7 +643,7 @@
                                left: movementForFirst
                             },
                             {
-                                duration: 1000,
+                                duration: 500,
                                 queue: true
                             })
                     } break;
@@ -657,7 +657,7 @@
                                 left: movementForLast
                             },
                             {
-                                duration: 1000,
+                                duration: 500,
                                 queue: true
                             })
                     } break;
@@ -671,7 +671,7 @@
                                 left: movementForFirst
                             },
                             {
-                                duration: 1000,
+                                duration: 500,
                                 queue: false
                             })
 
@@ -680,7 +680,7 @@
                                 left: movementForLast
                             },
                             {
-                                duration: 1000,
+                                duration: 500,
                                 queue: false
                             })
                     } break;
