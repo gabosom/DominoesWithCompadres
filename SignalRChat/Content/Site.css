@@ -233,6 +233,10 @@ input[type="checkbox"].input-validation-error {
         0 0 40px rgba(255, 215, 0, .3) inset;
 }
 
+.zero{
+    background: url("img/tile_0.png") no-repeat;
+}
+
 .one{
     background: url("img/tile_1.png") no-repeat;
 }
