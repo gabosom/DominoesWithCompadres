@@ -475,6 +475,7 @@ input[type="checkbox"].input-validation-error {
     #boardContainer{
         width:100%;
         height:65%;
+        background: none;
     }
 
         .mobile_playabbleArea
@@ -486,6 +487,7 @@ input[type="checkbox"].input-validation-error {
             border-radius: 4px;
             -moz-border-radius: 4px;
             -webkit-border-radius: 4px;
+            background: url('/Content/img/wood_for_desktop.jpg') no-repeat; 
         }
 
         .mobile_playLast
@@ -534,7 +536,6 @@ input[type="checkbox"].input-validation-error {
     {
         width:60px;
         height:30px;
-        position:absolute;
     }
 
         .mobile_playabbleArea > .tile > div

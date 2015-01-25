@@ -984,6 +984,8 @@
 
     function playTileOnBoard(tile, listPosition)
     {
+        $(".droppableTileZone").css("visibility", "hidden");
+
         //fixes the tiles value if needed
         switch(listPosition)
         {
@@ -1148,6 +1150,10 @@
     //tile is a tile object, listPosition is either "first" or "last"
     function playTileOnBoardOld(tile, listPosition)
     {
+
+        //hide the current droppable zone
+        $(".droppableTileZone").css("visibility", "hidden");
+
         //TODO 31: need to figure out what happens when joining mid game
         //when it's the first, need to anchor it to the middle
         if (viewModel.playedTiles().length == 0) {
