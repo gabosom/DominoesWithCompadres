@@ -118,6 +118,11 @@
 
                     //finish any animations going
                     finishAllAnimations();
+                    if (droppableTargetAnimationTimer != null)
+                    {
+                        droppableTargetAnimationTimer = null;
+                        generateDroppableZonesForPlays();
+                    }
 
 
                     $(".myTileContainer > .tile").removeClass("selected");
@@ -543,7 +548,7 @@
         }
         else
         {
-            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(false, true);
+            $(".mobile_playFirst > .playTile").add(".mobile_playLast > .playTile").filter(":animated").stop(false, true);            
         }
     }
 
