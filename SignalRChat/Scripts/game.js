@@ -70,7 +70,7 @@
 
             //one loop to add it all back
             for (i = 0; i < updatedPlayerList.length; i++)
-                self.addPlayer(players[i]);
+                self.addPlayer(updatedPlayerList[i]);
         };
 
         self.setAvailableTiles = function (tiles) {
