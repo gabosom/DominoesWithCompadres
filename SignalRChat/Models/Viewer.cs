@@ -10,6 +10,7 @@ namespace DominoesWithCompadres.Models
     {
         [JsonProperty("connectionId")]
         public string ConnectionID { get; set; }
-        public int ID { get; set; }
+        [JsonProperty("id")]
+        public string ID { get; set; }
     }
 }

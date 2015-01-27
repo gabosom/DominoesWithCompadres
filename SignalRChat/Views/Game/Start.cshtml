@@ -9,11 +9,11 @@
 </div>
 <div id="gameContainer">
     
-
     <input type="hidden" id="gameCode" value="@Model.GameCode" />
     <input type="hidden" id="userType" value="@ViewBag.UserType" />
     <input type="hidden" id="displayName" value="@ViewBag.DisplayName" />
-
+    <input type="hidden" id="userId" value="" data-bind="value:userId" />
+    
     <div class="gameInfoContainer">
         <div class="mobile_playabbleArea mobile_playLast" data-bind="foreach: mobile_lastPlayedTile">
             <div class="playTile tile"  data-bind="attr: {'data-tileId' : id}, css: $parent.getTilesDropClasses($data)">

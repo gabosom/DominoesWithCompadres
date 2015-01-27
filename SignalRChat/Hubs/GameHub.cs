@@ -15,16 +15,17 @@ namespace DominoesWithCompadres.Hubs
     {
         public void JoinGame(string displayName, string gameCode, UserType userType)
         {
+            string userId = (string)this.Clients.Caller.userId;
             switch(userType)
             {
                 case UserType.Player:
                     {
-                        GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, this);                        
+                        GameService.PlayerJoined(gameCode, displayName, Context.ConnectionId, userId,  this);                        
                     }break;
 
                 case UserType.Viewer:
                     {
-                        GameService.ViewerJoined(gameCode, Context.ConnectionId, this);
+                        GameService.ViewerJoined(gameCode, Context.ConnectionId, userId, this);
                     }break;
             }
         }

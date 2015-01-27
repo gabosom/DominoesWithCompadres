@@ -11,7 +11,8 @@ namespace DominoesWithCompadres.Models
         public string DisplayName { get; set; }
         [JsonProperty("connectionId")]
         public string ConnectionID { get; set; }
-        public int ID { get; set; }
+        [JsonProperty("id")]
+        public string ID { get; set; }
         public bool IsReady { get; set; }
         public List<Tile> Tiles { get; set; }
         [JsonProperty("points")]

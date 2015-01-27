@@ -3,6 +3,7 @@
 
     var gameCode = $("#gameCode").val();
     var userType = $("#userType").val();
+    var userId = $("#userId").val();
     var displayName = $("#displayName").val();
     var userInTurn = false;
     var tilesInRound = new Array();
@@ -36,6 +37,7 @@
         self.screenOrientation = ko.observable();
         self.mobile_lastPlayedTile = ko.observableArray();
         self.mobile_firstPlayedTile = ko.observableArray();
+        self.userId = ko.observable();
 
         this.initializeViewModel = function (game) {
             this.gameCode(game.GameCode);
@@ -194,7 +196,7 @@
     ko.applyBindings(viewModel);
 
 
-    /************* 
+    /****************** 
     SignalR Communication Layer 
     ******************/
     var gameHub = $.connection.gameHub;
@@ -210,9 +212,12 @@
         viewModel.addPlayer(player);
     };
 
-    gameHub.client.setupGame = function (game) {
+    gameHub.client.setupGame = function (game, generatedUserId) {
         WriteConsole("GameHub: Setting up game...");
         viewModel.initializeViewModel(game);
+
+        //TODO 63
+        viewModel.userId(generatedUserId);
         changeGameState(game.State);
     };
 
@@ -311,11 +316,23 @@
     $.connection.hub.start().done(function () {
 
         gameHub.state.gameCode = gameCode;
+        gameHub.state.userId = userId;
 
         //make user join game
         gameHub.server.joinGame(displayName, gameCode, userType);
     });
 
+
+    $.connection.hub.disconnected(function () {
+        $.connection.hub.start().done(function () {
+
+            gameHub.state.gameCode = gameCode;
+            gameHub.state.userId = userId;
+
+            //make user join game
+            gameHub.server.joinGame(displayName, gameCode, userType);
+        });
+    });
 
     
     /********* 
@@ -1624,7 +1641,6 @@
             }
         }
     }
-
 });
 // This optional function html-encodes messages for display in the page.
 function htmlEncode(value) {
