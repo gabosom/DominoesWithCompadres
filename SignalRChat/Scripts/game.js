@@ -115,21 +115,17 @@
             {
                 if (userInTurn)
                 {
-
                     //finish any animations going
                     finishAllAnimations();
                     if (droppableTargetAnimationTimer != null)
                     {
+                        window.clearTimeout(droppableTargetAnimationTimer);
                         droppableTargetAnimationTimer = null;
                         generateDroppableZonesForPlays();
                     }
 
-
                     $(".myTileContainer > .tile").removeClass("selected");
-                
                     self.mySelectedTile(selectedTile);
-
-                    //TODO 2: if user clicks a selected tile, it should unselect and hide possible plays
                     $(".myTileContainer > div[data-tileid='" + selectedTile.id+ "']").addClass("selected");
 
 
@@ -139,10 +135,8 @@
             }
         };
 
-        self.getTilesDropClasses = function (tile) {
-            
+        self.getTilesDropClasses = function (tile) {  
             return getDropClassForValue(tile.value1) + " " + getDropClassForValue(tile.value2);
-            
         };
 
         self.getWordNumbersFromValue = function(value) {
